@@ -82,6 +82,8 @@ const scrapRestaurant = async (url) => {
         } else if(getDomain(url) === 'zomato') {
             await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
             await page.goto(url,{waitUntil: 'domcontentloaded'});
+            const preData = await page.evaluate(() => document.querySelector('*').outerHTML);
+            console.log(preData);
             const data = await page.evaluate(() => {
                 const title = document.querySelector('h1.sc-7kepeu-0:nth-child(1)').innerText;
                 const rating = document.querySelector('.lhdg1m-2').innerText;
