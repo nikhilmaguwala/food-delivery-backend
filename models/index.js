@@ -10,7 +10,6 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
             rejectUnauthorized: false
         }
     },
-    operatorsAliases: false,
     logging: false,
     pool: {
         max: dbConfig.pool.max,
@@ -27,5 +26,10 @@ db.sequelize = sequelize;
 
 db.restaurants = require("./restaurant.model.js")(sequelize, Sequelize);
 db.dishes = require("./dish.model.js")(sequelize, Sequelize);
+db.users = require("./user.model.js")(sequelize, Sequelize);
+db.addresses = require("./address.model.js")(sequelize, Sequelize);
+
+db.users.hasMany(db.addresses, {as : 'Address', foreignKey : 'id'});
+
 
 module.exports = db;

@@ -30,6 +30,7 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT;
 require("./routes/restaurant.routes")(app);
 require("./routes/dish.routes")(app);
+require("./routes/user.routes")(app);
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

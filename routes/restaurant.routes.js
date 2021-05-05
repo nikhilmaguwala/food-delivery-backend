@@ -1,28 +1,30 @@
+const authJwt = require('./auth/verifyJwtToken');
+
 module.exports = app => {
     const restaurant = require("../controllers/restaurant.controller");
 
     const router = require("express").Router();
 
     // Create a new Restaurant
-    router.post("/", restaurant.create);
+    router.post("/",[authJwt.verifyToken], restaurant.create);
 
     // Retrieve all Restaurants
-    router.get("/", restaurant.findAll);
+    router.get("/", [authJwt.verifyToken], restaurant.findAll);
 
     // Add Restaurant using Zomato/ Swiggy Link
-    router.post("/link", restaurant.createByLink);
+    router.post("/link", [authJwt.verifyToken], restaurant.createByLink);
 
     // Retrieve a single Restaurant with id
-    router.get("/:id", restaurant.findOne);
+    router.get("/:id", [authJwt.verifyToken], restaurant.findOne);
 
     // Update a Restaurant with id
-    router.put("/:id", restaurant.update);
+    router.put("/:id", [authJwt.verifyToken], restaurant.update);
 
     // Delete a Restaurant with id
-    router.delete("/:id", restaurant.delete);
+    router.delete("/:id", [authJwt.verifyToken], restaurant.delete);
 
     // Create a new Restaurant
-    router.delete("/", restaurant.deleteAll);
+    router.delete("/", [authJwt.verifyToken], restaurant.deleteAll);
 
     app.use('/api/restaurants', router);
 };
