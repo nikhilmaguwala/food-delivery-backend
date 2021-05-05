@@ -28,6 +28,7 @@ db.restaurants = require("./restaurant.model.js")(sequelize, Sequelize);
 db.dishes = require("./dish.model.js")(sequelize, Sequelize);
 db.users = require("./user.model.js")(sequelize, Sequelize);
 db.addresses = require("./address.model.js")(sequelize, Sequelize);
+db.partners = require("./partner.model.js")(sequelize, Sequelize);
 
 db.users.hasMany(db.addresses, {as : 'Address', foreignKey : 'id'});
 
