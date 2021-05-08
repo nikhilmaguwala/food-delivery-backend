@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const db = require("../models");
 const config = require("../config/db.config");
+const { roles } = require("../utilities/constants");
 const Partners = db.partners;
 
 // Create and Save a new Partner
@@ -93,7 +94,7 @@ exports.signin = (req, res) => {
             return res.status(401).send({ auth: false, accessToken: null, reason: "Invalid Password!" });
         }
 
-        let token = jwt.sign({ id: partner.id, role: "partner" }, config.secret, {
+        let token = jwt.sign({ id: partner.id, role: roles.PARTNER }, config.secret, {
             expiresIn: 86400 // expires in 24 hours
         });
 

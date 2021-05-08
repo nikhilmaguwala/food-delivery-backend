@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const db = require("../models");
 const config = require("../config/db.config");
+const { roles } = require("../utilities/constants");
 const Users = db.users;
 const Op = db.Sequelize.Op;
 
@@ -92,7 +93,7 @@ exports.signin = (req, res) => {
             return res.status(401).send({ auth: false, accessToken: null, reason: "Invalid Password!" });
         }
 
-        let token = jwt.sign({ id: user.id, role: "default" }, config.secret, {
+        let token = jwt.sign({ id: user.id, role: roles.DEFAULT }, config.secret, {
             expiresIn: 86400 // expires in 24 hours
         });
 

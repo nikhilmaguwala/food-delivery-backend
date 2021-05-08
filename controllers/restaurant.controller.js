@@ -32,7 +32,8 @@ exports.create = async (req, res) => {
         name: req.body.name,
         category: req.body.category,
         location: req.body.location,
-        rating: req.body.rating
+        rating: req.body.rating,
+        partnerId: req.partnerId
     };
 
     // Save Restaurant in the database
@@ -71,9 +72,18 @@ exports.findOne = (req, res) => {
 
     Restaurant.findByPk(id)
         .then(data => {
-            res.send(data);
+            if(!data)
+            {
+                res.status(404).send({
+                    message: `Restaurant with id=${id} was not found`
+                });
+            }
+            else {
+                res.send(data);
+            }
         })
         .catch(err => {
+            console.log("hel"+err)
             res.status(500).send({
                 message: "Error retrieving Restaurant with id=" + id
             });
@@ -88,7 +98,7 @@ exports.update = (req, res) => {
         where: { id: id }
     })
         .then(num => {
-            if (num === 1) {
+            if (num[0] === 1) {
                 res.send({
                     message: "Restaurant was updated successfully."
                 });
@@ -174,6 +184,7 @@ exports.createByLink = async (req, res) => {
             location: restaurant.location,
             rating: parseFloat(restaurant.rating),
             city: restaurant.city,
+            partnerId: req.partnerId
         };
 
         // Save Restaurant in the database

@@ -81,7 +81,15 @@ exports.findOne = (req, res) => {
 
     Dishes.findByPk(id)
         .then(data => {
-            res.send(data);
+            if(!data)
+            {
+                res.status(404).send({
+                    message: `Dish with id=${id}was not found`
+                });
+            }
+            else {
+                res.send(data);
+            }
         })
         .catch(err => {
             res.status(500).send({
@@ -98,7 +106,7 @@ exports.update = (req, res) => {
         where: { id: id }
     })
         .then(num => {
-            if (num === 1) {
+            if (num[0] === 1) {
                 res.send({
                     message: "Dish was updated successfully."
                 });
@@ -123,7 +131,7 @@ exports.delete = (req, res) => {
         where: { id: id }
     })
         .then(num => {
-            if (num === 1) {
+            if (num[0] === 1) {
                 res.send({
                     message: "Dish was deleted successfully!"
                 });
