@@ -200,14 +200,14 @@ exports.createByLink = async (req, res) => {
         };
 
         // Save Restaurant in the database
-        // await Restaurant.create(newRestaurant)
-        //     .then(data => {
-        //         res_id = data.dataValues.id
-        //     })
-        //     .catch(err => {
-        //         console.log(err)
-        //         error = "Some error occurred while Adding the Restaurant.";
-        //     });
+        await Restaurant.create(newRestaurant)
+            .then(data => {
+                res_id = data.dataValues.id
+            })
+            .catch(err => {
+                console.log(err)
+                error = "Some error occurred while Adding the Restaurant.";
+            });
     }
 
     if(error !== '' || res_id === null) {
@@ -240,7 +240,7 @@ exports.createByLink = async (req, res) => {
                 restaurant_id: res_id,
             }
 
-            // Dishes.create(new_dish).then().catch();
+            Dishes.create(new_dish).then().catch();
         })
         res.status(200).send({
             success: "Adding Restaurant is Successful..!"
