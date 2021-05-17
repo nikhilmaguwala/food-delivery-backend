@@ -11,13 +11,15 @@ module.exports = app => {
     router.post("/",[authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.create);
 
     // Retrieve all Restaurants
-    router.get("/", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findAll);
+    // router.get("/", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findAll);
+    router.get("/", restaurant.findAll);
 
     // Add Restaurant using Zomato/ Swiggy Link
     router.post("/link", [authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.createByLink);
 
     // Retrieve a single Restaurant with id
-    router.get("/:id", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findOne);
+    // router.get("/:id", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findOne);
+    router.get("/:id", restaurant.findOne);
 
     // Update a Restaurant with id
     router.put("/:id", [authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.update);

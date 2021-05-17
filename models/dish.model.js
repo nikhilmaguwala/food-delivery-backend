@@ -19,15 +19,9 @@ module.exports = (sequelize, Sequelize) => {
         availability_time: {
             type : Sequelize.INTEGER,
         },
-        resId : {
-            type : Sequelize.INTEGER,
-            allowNull: false,
-            onDelete : 'CASCADE',
-            references : {
-                model : 'restaurants',
-                key : 'id',
-                as : 'resId'
-            },
-        },
+        image_url: {
+            type: Sequelize.TEXT,
+            defaultValue: ''
+        }
     });
 };

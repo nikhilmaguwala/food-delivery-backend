@@ -39,6 +39,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         city: {
             type: Sequelize.STRING,
+        },
+        image_url: {
+            type: Sequelize.TEXT,
+            defaultValue: ''
         }
     });
 };

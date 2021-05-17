@@ -70,8 +70,12 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    Restaurant.findByPk(id)
-        .then(data => {
+    Restaurant.findOne({
+        where: {id: id},
+        include: [{
+            model: Dishes
+        }]
+    }).then(data => {
             if(!data)
             {
                 res.status(404).send({
@@ -157,14 +161,18 @@ exports.deleteAll = (req, res) => {
         });
 };
 
+// Add a Restaurant by the Link of Zomato or Swiggy
 exports.createByLink = async (req, res) => {
+
     const restaurant = await scrapRestaurant(req.body.url);
+
     if(restaurant.error) {
         res.status(500).send({
             message: "Invalid Link, Please check link and try again!"
         });
         return;
     }
+
     let res_id;
     let error = '';
 
@@ -174,9 +182,12 @@ exports.createByLink = async (req, res) => {
         }
     });
 
-    if(existRes) {
+    if(existRes)
+    {
         res_id = parseInt(existRes.id);
-    } else {
+    }
+    else
+    {
         // Create a Restaurant
         const newRestaurant = {
             name: restaurant.name,
@@ -184,18 +195,19 @@ exports.createByLink = async (req, res) => {
             location: restaurant.location,
             rating: parseFloat(restaurant.rating),
             city: restaurant.city,
-            partnerId: req.partnerId
+            partnerId: req.partnerId,
+            image_url: restaurant.image
         };
 
         // Save Restaurant in the database
-        await Restaurant.create(newRestaurant)
-            .then(data => {
-                res_id = data.dataValues.id
-            })
-            .catch(err => {
-                console.log(err)
-                error = "Some error occurred while Adding the Restaurant.";
-            });
+        // await Restaurant.create(newRestaurant)
+        //     .then(data => {
+        //         res_id = data.dataValues.id
+        //     })
+        //     .catch(err => {
+        //         console.log(err)
+        //         error = "Some error occurred while Adding the Restaurant.";
+        //     });
     }
 
     if(error !== '' || res_id === null) {
@@ -217,17 +229,18 @@ exports.createByLink = async (req, res) => {
                 existDish = false;
             }).catch(() => {
                 existDish = true;
-            })
+            });
             return existDish;
         }).map((my_dish) => {
             const new_dish = {
                 dish_name: my_dish.name,
                 dish_type: my_dish.type,
                 dish_price: my_dish.price,
-                resId: res_id,
+                image_url: my_dish.image_url,
+                restaurant_id: res_id,
             }
 
-            Dishes.create(new_dish).then().catch();
+            // Dishes.create(new_dish).then().catch();
         })
         res.status(200).send({
             success: "Adding Restaurant is Successful..!"
