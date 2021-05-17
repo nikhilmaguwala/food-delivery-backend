@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
     // Create a Restaurant
     const restaurant = {
         name: req.body.name,
-        category: req.body.category,
+        category: 'req.body.category',
         location: req.body.location,
         rating: req.body.rating,
         partnerId: req.partnerId
