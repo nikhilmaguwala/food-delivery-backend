@@ -15,7 +15,8 @@ module.exports = app => {
     router.get("/", restaurant.findAll);
 
     // Add Restaurant using Zomato/ Swiggy Link
-    router.post("/link", [authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.createByLink);
+    router.post("/link", restaurant.createByLink);
+    // router.post("/link", [authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.createByLink);
 
     // Retrieve a single Restaurant with id
     // router.get("/:id", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findOne);

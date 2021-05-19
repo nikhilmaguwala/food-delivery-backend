@@ -1,5 +1,6 @@
 const db = require("../models");
 const Restaurant = db.restaurants;
+const Category = db.categories;
 const Dishes = db.dishes;
 const Op = db.Sequelize.Op;
 const scrapRestaurant = require('../service/scrapping')
@@ -163,9 +164,8 @@ exports.deleteAll = (req, res) => {
 
 // Add a Restaurant by the Link of Zomato or Swiggy
 exports.createByLink = async (req, res) => {
-
     const restaurant = await scrapRestaurant(req.body.url);
-
+    console.log(restaurant.categories)
     if(restaurant.error) {
         res.status(500).send({
             message: "Invalid Link, Please check link and try again!"
@@ -191,16 +191,22 @@ exports.createByLink = async (req, res) => {
         // Create a Restaurant
         const newRestaurant = {
             name: restaurant.name,
-            category: restaurant.categories,
             location: restaurant.location,
             rating: parseFloat(restaurant.rating),
             city: restaurant.city,
             partnerId: req.partnerId,
-            image_url: restaurant.image
+            image_url: restaurant.image,
+            category: restaurant.categories
         };
 
         // Save Restaurant in the database
-        await Restaurant.create(newRestaurant)
+        await Restaurant.create(newRestaurant,
+            {
+                include: [{
+                    model: Category,
+                    as: "categories"
+                }]
+            })
             .then(data => {
                 res_id = data.dataValues.id
             })
@@ -217,6 +223,7 @@ exports.createByLink = async (req, res) => {
         return;
     }
 
+    // Adding Dishes to the Database
     try {
         await restaurant.items.filter((my_dish) => {
             let existDish = true;
@@ -251,3 +258,4 @@ exports.createByLink = async (req, res) => {
         });
     }
 }
+
