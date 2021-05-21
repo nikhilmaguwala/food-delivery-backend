@@ -1,44 +1,47 @@
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
     return sequelize.define("restaurant", {
         name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
         },
         location: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
         },
         rating: {
-            type: Sequelize.FLOAT,
+            type: DataTypes.FLOAT,
             allowNull: false,
         },
         accepts_order: {
-            type: Sequelize.BOOLEAN,
+            type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
         restaurant_latitude: {
-            type: Sequelize.FLOAT,
+            type: DataTypes.FLOAT,
         },
         restaurant_longitude: {
-            type: Sequelize.FLOAT,
+            type: DataTypes.FLOAT,
         },
         status: {
-            type: Sequelize.BOOLEAN,
+            type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
         partnerId: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
         },
         verifiedStatus: {
-            type: Sequelize.BOOLEAN,
+            type: DataTypes.BOOLEAN,
             defaultValue: false,
         },
         city: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         image_url: {
-            type: Sequelize.TEXT,
+            type: DataTypes.TEXT,
             defaultValue: ''
         }
+    },
+    {
+        freezeTableName: true
     });
 };

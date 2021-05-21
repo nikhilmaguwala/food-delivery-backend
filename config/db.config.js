@@ -12,6 +12,5 @@ module.exports = {
         min: 0,
         acquire: 3000000,
         idle: 500000
-    },
-    secret: "super-secret-jwt-key"
+    }
 };

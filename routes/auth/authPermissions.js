@@ -5,7 +5,10 @@ exports.permit = (...permittedRoles) => {
         if (role && permittedRoles.includes(role)) {
             next(); // role is allowed, so continue on the next middleware
         } else {
-            response.status(403).json({message: "Forbidden"}); // user is forbidden
+            response.status(403).json({
+                message: 'Forbidden',
+                description: "You are not authorised to process this request."
+            });
         }
     }
 }

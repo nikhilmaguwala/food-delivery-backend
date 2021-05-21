@@ -1,27 +1,33 @@
-module.exports = (sequelize, Sequelize) => {
+const { DISH_TYPES } = require("../utilities/constants");
+
+module.exports = (sequelize, DataTypes) => {
     return sequelize.define("dish", {
         dish_name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
         },
         dish_type: {
-            type: Sequelize.STRING,
+            type: DataTypes.ENUM,
+            values: [ DISH_TYPES.VEG, DISH_TYPES.NON_VEG ],
             allowNull: false,
         },
         dish_price: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         availability: {
-            type: Sequelize.BOOLEAN,
+            type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
         availability_time: {
-            type : Sequelize.INTEGER,
+            type : DataTypes.INTEGER,
         },
         image_url: {
-            type: Sequelize.TEXT,
+            type: DataTypes.TEXT,
             defaultValue: ''
         }
+    },
+    {
+        freezeTableName: true
     });
 };

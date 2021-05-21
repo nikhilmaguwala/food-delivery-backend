@@ -1,18 +1,18 @@
-module.exports = (sequelize, Sequelize) => {
+const { ADDRESS_TYPES } = require("../utilities/constants");
+
+module.exports = (sequelize, DataTypes) => {
     return sequelize.define("address", {
         type: {
-            type: Sequelize.STRING,
+            type: DataTypes.ENUM,
+            values: [ ADDRESS_TYPES.BILLING, ADDRESS_TYPES.SHIPPING ],
             allowNull: false,
-            // validate: {
-            //     validateType: function(value) {
-            //         if(value==="ALL" || value==="COD" || value==="")
-            //     }
-            // }
         },
         location: {
-            type: Sequelize.STRING,
-            isEmail: true,
+            type: DataTypes.STRING,
             allowNull: false,
         }
+    },
+    {
+        freezeTableName: true
     });
 };

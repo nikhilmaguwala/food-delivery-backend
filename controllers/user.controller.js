@@ -2,11 +2,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const db = require("../models");
-const config = require("../config/db.config");
-const { roles } = require("../utilities/constants");
-const Users = db.users;
-const Op = db.Sequelize.Op;
+const jwtConfig = require("../config/jwt.config");
+const { ROLES } = require("../utilities/constants");
 
+const Users = db.user;
 
 // Create and Save a new User
 exports.signup = async (req, res) => {
@@ -85,21 +84,34 @@ exports.signin = (req, res) => {
         }
     }).then(user => {
         if (!user) {
-            return res.status(404).send('User Not Found.');
+            return res.status(404).send({
+                auth: false,
+                message: 'User Not Found.',
+            });
         }
 
         let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
         if (!passwordIsValid) {
-            return res.status(401).send({ auth: false, accessToken: null, reason: "Invalid Password!" });
+            return res.status(401).send({
+                auth: false,
+                accessToken: null,
+                message: "Invalid Password!"
+            });
         }
 
-        let token = jwt.sign({ id: user.id, role: roles.DEFAULT }, config.secret, {
+        let token = jwt.sign({ id: user.id, role: ROLES.DEFAULT }, jwtConfig.JWT_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
-        res.status(200).send({ auth: true, accessToken: token });
+        res.status(200).send({
+            auth: true,
+            accessToken: token
+        });
 
     }).catch(err => {
-        res.status(500).send('Error -> ' + err);
+        res.status(500).send({
+            message: 'Something went wrong.',
+            description: err
+        });
     });
 }

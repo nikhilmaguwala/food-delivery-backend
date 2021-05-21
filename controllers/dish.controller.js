@@ -1,6 +1,7 @@
 const db = require("../models");
-const Restaurant = db.restaurants;
-const Dishes = db.dishes;
+
+const Restaurant = db.restaurant;
+const Dish = db.dish;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Dish
@@ -12,21 +13,20 @@ exports.create = async (req, res) => {
         });
         return;
     }
-    let res_id;
 
     const ExistRes = await Restaurant.findByPk(req.body.restaurant_id)
 
     if(!ExistRes) {
         res.status(400).send({
-            message: "Restaurant not Exist!"
+            message: "Restaurant does not Exist!"
         });
         return;
     }
 
-    const existDish = await Dishes.findOne({
+    const existDish = await Dish.findOne({
         where: {
             dish_name: req.body.dish_name,
-            resId: req.body.restaurant_id,
+            restaurant_id: req.body.restaurant_id,
         }
     })
 
@@ -42,18 +42,18 @@ exports.create = async (req, res) => {
         dish_name: req.body.dish_name,
         dish_type: req.body.dish_type,
         dish_price: req.body.dish_price,
-        resId: req.body.restaurant_id,
+        restaurant_id: req.body.restaurant_id,
     };
 
     // Save Dishes in the database
-    Dishes.create(dish)
+    Dish.create(dish)
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while Adding the Dish."
+                message: "Some error occurred while Adding the Dish.",
+                description: err
             });
         });
 };
@@ -63,14 +63,14 @@ exports.findAll = (req, res) => {
     const title = req.query.dish_name;
     const condition = title ? { dish_name: { [Op.iLike]: `%${title}%` } } : null;
 
-    Dishes.findAll({ where: condition })
+    Dish.findAll({ where: condition })
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while retrieving dishes."
+                message: "Some error occurred while Retrieving the Dishes.",
+                description: err
             });
         });
 };
@@ -79,7 +79,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    Dishes.findByPk(id)
+    Dish.findByPk(id)
         .then(data => {
             if(!data)
             {
@@ -93,7 +93,8 @@ exports.findOne = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error retrieving Dish with id=" + id
+                message: "Error retrieving Dish with id=" + id,
+                description: err
             });
         });
 };
@@ -102,7 +103,7 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     const id = req.params.id;
 
-    Dishes.update(req.body, {
+    Dish.update(req.body, {
         where: { id: id }
     })
         .then(num => {
@@ -118,7 +119,8 @@ exports.update = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating Dish with id=" + id
+                message: "Error updating Dish with id=" + id,
+                description: err
             });
         });
 };
@@ -127,7 +129,7 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     const id = req.params.id;
 
-    Dishes.destroy({
+    Dish.destroy({
         where: { id: id }
     })
         .then(num => {
@@ -143,14 +145,15 @@ exports.delete = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: "Could not delete Dish with id=" + id
+                message: "Could not delete Dish with id=" + id,
+                description: err
             });
         });
 };
 
 // Delete all Dishes from the database.
 exports.deleteAll = (req, res) => {
-    Dishes.destroy({
+    Dish.destroy({
         where: {},
         truncate: false
     })
@@ -159,8 +162,8 @@ exports.deleteAll = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while removing all dishes."
+                message: "Some error occurred while removing all dishes.",
+                description: err
             });
         });
 };

@@ -2,9 +2,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const db = require("../models");
-const config = require("../config/db.config");
-const { roles } = require("../utilities/constants");
-const Partners = db.partners;
+const jwtConfig = require("../config/jwt.config");
+const { ROLES } = require("../utilities/constants");
+
+const Partner = db.partner;
 
 // Create and Save a new Partner
 exports.signup = async (req, res) => {
@@ -16,7 +17,7 @@ exports.signup = async (req, res) => {
         return;
     }
 
-    Partners.findOne({
+    Partner.findOne({
         where: {
             email: req.body.email
         }
@@ -27,7 +28,7 @@ exports.signup = async (req, res) => {
             });
             return;
         } else {
-            Partners.findOne({
+            Partner.findOne({
                 where: {
                     phone: req.body.phone
                 }
@@ -50,7 +51,7 @@ exports.signup = async (req, res) => {
                     }
 
                     // Save Partners in the database
-                    Partners.create(partner)
+                    Partner.create(partner)
                         .then(data => {
                             res.send({
                                 name: data.name,
@@ -80,27 +81,43 @@ exports.signin = (req, res) => {
         return;
     }
 
-    Partners.findOne({
+    Partner.findOne({
         where: {
             email: req.body.email
         }
     }).then(partner => {
         if (!partner) {
-            return res.status(404).send('Partner Not Found.');
+            return res.status(404).send({
+                auth: false,
+                message: 'Partner Not Found.',
+            });
         }
 
         let passwordIsValid = bcrypt.compareSync(req.body.password, partner.password);
         if (!passwordIsValid) {
-            return res.status(401).send({ auth: false, accessToken: null, reason: "Invalid Password!" });
+            return res.status(401).send({
+                auth: false,
+                accessToken: null,
+                message: "Invalid Password!"
+            });
         }
 
-        let token = jwt.sign({ id: partner.id, role: roles.PARTNER }, config.secret, {
+        let token = jwt.sign({
+            id: partner.id,
+            role: ROLES.PARTNER
+        }, jwtConfig.JWT_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
-        res.status(200).send({ auth: true, accessToken: token });
+        res.status(200).send({
+            auth: true,
+            accessToken: token
+        });
 
     }).catch(err => {
-        res.status(500).send('Error -> ' + err);
+        res.status(500).send({
+            message: 'Something went wrong.',
+            description: err
+        });
     });
 }

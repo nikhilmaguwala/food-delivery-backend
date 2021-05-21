@@ -1,9 +1,10 @@
 const db = require("../models");
-const Restaurant = db.restaurants;
-const Category = db.categories;
-const Dishes = db.dishes;
+
+const Restaurant = db.restaurant;
+const Category = db.category;
+const Dish = db.dish;
 const Op = db.Sequelize.Op;
-const scrapRestaurant = require('../service/scrapping')
+const scrapRestaurant = require('../service/scrapping');
 
 // Create and Save a new Restaurant
 exports.create = async (req, res) => {
@@ -60,7 +61,7 @@ exports.findAll = (req, res) => {
             res.send(data);
         })
         .catch(err => {
-            res.status(500).send({
+            return res.status(500).send({
                 message:
                     err.message || "Some error occurred while retrieving restaurants."
             });
@@ -74,7 +75,7 @@ exports.findOne = (req, res) => {
     Restaurant.findOne({
         where: {id: id},
         include: [{
-            model: Dishes
+            model: Dish
         }]
     }).then(data => {
             if(!data)
@@ -165,16 +166,14 @@ exports.deleteAll = (req, res) => {
 // Add a Restaurant by the Link of Zomato or Swiggy
 exports.createByLink = async (req, res) => {
     const restaurant = await scrapRestaurant(req.body.url);
-    console.log(restaurant.categories)
+
     if(restaurant.error) {
-        res.status(500).send({
+        return res.status(500).send({
             message: "Invalid Link, Please check link and try again!"
         });
-        return;
     }
 
     let res_id;
-    let error = '';
 
     const existRes = await Restaurant.findOne({
         where: {
@@ -188,6 +187,34 @@ exports.createByLink = async (req, res) => {
     }
     else
     {
+        // Create Categories
+        restaurant.categories.map(async category => {
+            await Category.findOne({
+                where: {
+                    name: category
+                }
+            }).then(async (data) => {
+                if (!data)
+                {
+                    await Category.create({ name: category })
+                        .then()
+                        .catch((err) => {
+                            return res.status(500).send({
+                                message: "Some error occurred while Adding the Scraped Categories.",
+                                description: err
+                            });
+                            return;
+                        });
+                }
+            }).catch((err) => {
+                return res.status(500).send({
+                    message: "Some error occurred while Adding the Scraped Categories.",
+                    description: err
+                });
+                return;
+            });
+        });
+
         // Create a Restaurant
         const newRestaurant = {
             name: restaurant.name,
@@ -196,66 +223,81 @@ exports.createByLink = async (req, res) => {
             city: restaurant.city,
             partnerId: req.partnerId,
             image_url: restaurant.image,
-            category: restaurant.categories
+            categories: restaurant.categories.map(category => ({ "name": category }))
         };
 
         // Save Restaurant in the database
-        await Restaurant.create(newRestaurant,
-            {
-                include: [{
-                    model: Category,
-                    as: "categories"
-                }]
-            })
-            .then(data => {
-                res_id = data.dataValues.id
-            })
-            .catch(err => {
-                console.log(err)
-                error = "Some error occurred while Adding the Restaurant.";
-            });
-    }
+        await Restaurant.create(newRestaurant)
+            .then(async newRes => {
+                res_id = newRes.dataValues.id;
+                restaurant.categories.map(async category => {
+                    await Category.findOne({
+                        where: {
+                            name: category
+                        }
+                    }).then(async (category) => {
+                        await newRes.addCategory(category);
+                        console.log(`Assigning: ${newRes.dataValues.name} -> ${category.dataValues.name}`)
+                    }).catch((err) => {
+                        console.log(err)
+                        return res.status(500).send({
+                            message: "Some error occurred while Adding category to the Scraped Restaurant.",
+                            description: err
+                        });
+                        return;
+                    });
 
-    if(error !== '' || res_id === null) {
-        res.status(500).send({
-            message: error
-        });
-        return;
+                });
+            }).catch (err => {
+                return res.status(500).send({
+                    message: "Some error occurred while Adding the Scraped Restaurant.",
+                    description: err
+                });
+                return;
+            });
     }
 
     // Adding Dishes to the Database
-    try {
-        await restaurant.items.filter((my_dish) => {
-            let existDish = true;
-            Dishes.findOne({
-                where: {
-                    dish_name: my_dish.name,
-                    resId: res_id,
-                }
-            }).then(() => {
-                existDish = false;
-            }).catch(() => {
-                existDish = true;
-            });
-            return existDish;
-        }).map((my_dish) => {
-            const new_dish = {
+    await restaurant.items.filter(async (my_dish) => {
+
+        let dishNotExists = true;
+
+        await Dish.findOne({
+            where: {
                 dish_name: my_dish.name,
-                dish_type: my_dish.type,
-                dish_price: my_dish.price,
-                image_url: my_dish.image_url,
                 restaurant_id: res_id,
             }
+        }).then(() => {
+            dishNotExists = false;
+        }).catch(() => {
+            dishNotExists = true;
+        });
 
-            Dishes.create(new_dish).then().catch();
-        })
-        res.status(200).send({
-            success: "Adding Restaurant is Successful..!"
-        });
-    } catch (e) {
-        res.status(500).send({
-            message: "Some error occurred while Adding the Dish."
-        });
-    }
+        return dishNotExists;
+
+    }).map(async (my_dish) => {
+
+        const new_dish = {
+            dish_name: my_dish.name,
+            dish_type: my_dish.type,
+            dish_price: my_dish.price,
+            image_url: my_dish.image_url,
+            restaurant_id: res_id,
+        }
+
+        await Dish.create(new_dish)
+            .then()
+            .catch((err) => {
+                return res.status(500).send({
+                    message: "Some error occurred while Adding the scraped Dish.",
+                    description: err
+                });
+                return;
+            });
+    })
+
+    return res.status(200).send({
+        message: "Adding Restaurant is Successful..!"
+    });
+    return;
 }
-

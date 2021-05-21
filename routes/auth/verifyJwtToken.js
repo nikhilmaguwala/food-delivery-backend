@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const config = require('../../config/db.config');
+const jwtConfig = require('../../config/jwt.config');
 const db = require("../../models");
-const Users = db.users;
-const Partners = db.partners;
-const { roles } = require('../../utilities/constants');
+const Users = db.user;
+const Partners = db.partner;
+const { ROLES } = require('../../utilities/constants');
 
 exports.verifyJwtToken = (req, res, next) => {
     let token = req.headers['x-access-token'];
@@ -13,14 +13,15 @@ exports.verifyJwtToken = (req, res, next) => {
             auth: false, message: 'No token provided.'
         });
     }
-    jwt.verify(token, config.secret, (err, decoded) => {
+    jwt.verify(token, jwtConfig.JWT_SECRET, (err, decoded) => {
         if (err){
             return res.status(500).send({
                 auth: false,
-                message: 'Fail to Authentication. Error -> ' + err
+                message: 'Fail to Authenticate.',
+                description: err
             });
         }
-        if (decoded.role === roles.DEFAULT)
+        if (decoded.role === ROLES.DEFAULT)
         {
             Users.findOne({
                 where: {
@@ -28,16 +29,23 @@ exports.verifyJwtToken = (req, res, next) => {
                 }
             }).then(user => {
                 if (!user) {
-                    return res.status(404).send('User Not Found.');
+                    return res.status(404).send({
+                        auth: false,
+                        message: 'User Not Found.',
+                    });
                 }
                 req.userId = decoded.id;
                 req.role = decoded.role
                 next();
             }).catch(err => {
-                res.status(500).send('Error -> ' + err);
+                res.status(500).send({
+                    auth: false,
+                    message: 'Something went wrong.',
+                    description: err
+                });
             });
         }
-        else if (decoded.role === roles.PARTNER)
+        else if (decoded.role === ROLES.PARTNER)
         {
             Partners.findOne({
                 where: {
@@ -45,13 +53,20 @@ exports.verifyJwtToken = (req, res, next) => {
                 }
             }).then(partner => {
                 if (!partner) {
-                    return res.status(404).send('Partner Not Found.');
+                    return res.status(404).send({
+                        auth: false,
+                        message: 'Partner Not Found.',
+                    });
                 }
                 req.partnerId = decoded.id;
                 req.role = decoded.role
                 next();
             }).catch(err => {
-                res.status(500).send('Error -> ' + err);
+                res.status(500).send({
+                    auth: false,
+                    message: 'Something went wrong.',
+                    description: err
+                });
             });
         }
     });

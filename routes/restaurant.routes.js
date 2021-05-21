@@ -1,5 +1,5 @@
 const authJwt = require('./auth/verifyJwtToken');
-const { roles } = require("../utilities/constants");
+const { ROLES } = require("../utilities/constants");
 const { permit } = require("./auth/authPermissions");
 
 module.exports = app => {
@@ -8,7 +8,7 @@ module.exports = app => {
     const router = require("express").Router();
 
     // Create a new Restaurant
-    router.post("/",[authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.create);
+    router.post("/",[authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.create);
 
     // Retrieve all Restaurants
     // router.get("/", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findAll);
@@ -23,13 +23,13 @@ module.exports = app => {
     router.get("/:id", restaurant.findOne);
 
     // Update a Restaurant with id
-    router.put("/:id", [authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.update);
+    router.put("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.update);
 
     // Delete a Restaurant with id
-    router.delete("/:id", [authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.delete);
+    router.delete("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.delete);
 
     // Create a new Restaurant
-    router.delete("/", [authJwt.verifyJwtToken, permit(roles.PARTNER)], restaurant.deleteAll);
+    router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.deleteAll);
 
     app.use('/api/restaurants', router);
 };

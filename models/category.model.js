@@ -1,8 +1,13 @@
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
     return sequelize.define("category", {
         name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
+            unique: true,
             allowNull: false,
         }
+
+    },
+    {
+        freezeTableName: true
     });
 };

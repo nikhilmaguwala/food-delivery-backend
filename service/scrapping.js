@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 
+const { DISH_TYPES } = require("../utilities/constants");
+
 const isValidHttpUrl = (string) => {
     const pattern = new RegExp('^(https?:\\/\\/)?'+
         '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
@@ -69,7 +71,7 @@ const scrapRestaurant = async (url) => {
             await page.goto(url, { waitUntil: 'load' });
             await autoScroll(page);
 
-            const data = await page.evaluate(() => {
+            const data = await page.evaluate((DISH_TYPES) => {
 
                 const title = document.querySelector('._3aqeL').innerText;
                 const categories = document.querySelector('._3Plw0').innerText.split(', ');
@@ -81,7 +83,7 @@ const scrapRestaurant = async (url) => {
                 const item_nodes = document.querySelectorAll('._2wg_t');
                 const items = Array.from(item_nodes).map((item) =>  {
                     const name = item.querySelector('.styles_itemName__2Aoj9').innerText;
-                    const type = item.querySelector('.styles_iconVeg__shLxJ') ? 'veg' : 'non-veg';
+                    const type = item.querySelector('.styles_iconVeg__shLxJ') ? DISH_TYPES.VEG : DISH_TYPES.NON_VEG;
                     const price = item.querySelector('.rupee').innerText;
                     const img_container = item.querySelector('.styles_itemImage__POX0b');
                     const image_url = img_container ? img_container.firstChild.src : ""
@@ -95,7 +97,7 @@ const scrapRestaurant = async (url) => {
 
                 return {title, categories, rating, location, city, image, items}
 
-            });
+            }, DISH_TYPES);
 
             await browser.close();
 
@@ -109,13 +111,14 @@ const scrapRestaurant = async (url) => {
                 image: data.image
             }
 
-        } else if(getDomain(url) === 'zomato') {
+        }
+        else if(getDomain(url) === 'zomato') {
 
             await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
             await page.goto(url, { waitUntil: 'load' });
             await autoScroll(page);
 
-            const data = await page.evaluate(() => {
+            const data = await page.evaluate((DISH_TYPES) => {
 
                 const title = document.querySelector('h1.sc-7kepeu-0:nth-child(1)').innerText;
                 const rating = document.querySelector('.lhdg1m-2').innerText;
@@ -129,12 +132,11 @@ const scrapRestaurant = async (url) => {
 
                 const item_class_nodes = document.querySelectorAll('.sc-iVOTot');
                 const items = Array.from(item_class_nodes).map((item_node) => {
-                    const sub_items = Array.from(item_node.nextSibling.childNodes).map((item) => {
-                        if (item.tagName !== 'P')
-                        {
+                    return Array.from(item_node.nextSibling.childNodes).map((item) => {
+                        if (item.tagName !== 'P') {
                             const name = item.querySelector('.sc-1s0saks-15').innerText;
-                            const type = item.querySelector('.sc-1tx3445-0').getAttribute("type");
-                            const price = item.querySelector('.cCiQWA').innerText.replace('₹','');
+                            const type = item.querySelector('.sc-1tx3445-0').getAttribute("type") === 'veg' ? DISH_TYPES.VEG : DISH_TYPES.NON_VEG;
+                            const price = item.querySelector('.cCiQWA').innerText.replace('₹', '');
                             const img_container = item.querySelector('.s1isp7-5');
                             const image_url = img_container ? img_container.src : ""
                             return {
@@ -145,13 +147,12 @@ const scrapRestaurant = async (url) => {
                             }
                         }
                     });
-                    return sub_items;
 
                 }).flat().filter((item) => item !== undefined );
 
                 return { title, rating, categories, location, city, image, items }
 
-            });
+            }, DISH_TYPES);
 
             return {
                 name: data.title,

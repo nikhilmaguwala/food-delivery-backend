@@ -1,16 +1,16 @@
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
     return sequelize.define("user", {
         name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
         },
         email: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             isEmail: true,
             allowNull: false,
         },
         phone: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             unique: true,
             allowNull: false,
             validate: {
@@ -30,8 +30,11 @@ module.exports = (sequelize, Sequelize) => {
             }
         },
         password: {
-            type : Sequelize.STRING,
+            type : DataTypes.STRING,
             allowNull: false
         },
+    },
+    {
+        freezeTableName: true
     });
 };

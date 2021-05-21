@@ -1,6 +1,6 @@
 const dbConfig = require("../config/db.config.js");
 
-const Sequelize = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
     dialect: dbConfig.dialect,
@@ -24,44 +24,45 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.users = require("./user.model.js")(sequelize, Sequelize);
-db.partners = require("./partner.model.js")(sequelize, Sequelize);
-db.restaurants = require("./restaurant.model.js")(sequelize, Sequelize);
-db.categories = require("./category.model")(sequelize, Sequelize);
-db.dishes = require("./dish.model.js")(sequelize, Sequelize);
-db.addresses = require("./address.model.js")(sequelize, Sequelize);
-db.orders = require("./order.model")(sequelize, Sequelize);
+db.user = require("./user.model.js")(sequelize, DataTypes);
+db.partner = require("./partner.model.js")(sequelize, DataTypes);
+db.restaurant = require("./restaurant.model.js")(sequelize, DataTypes);
+db.category = require("./category.model")(sequelize, DataTypes);
+db.dish = require("./dish.model.js")(sequelize, DataTypes);
+db.address = require("./address.model.js")(sequelize, DataTypes);
+db.order = require("./order.model")(sequelize, DataTypes);
 
 
 // Setting relationships
-db.users.hasMany(db.addresses, { foreignKey : 'user_id' });
-db.addresses.belongsTo(db.users, { foreignKey : 'user_id' });
 
-db.restaurants.hasMany(db.dishes, { foreignKey: 'restaurant_id' });
-db.dishes.belongsTo(db.restaurants, { foreignKey: 'restaurant_id' });
+//1. Many to One relationships
+db.user.hasMany(db.address, { foreignKey : 'user_id' });
+db.address.belongsTo(db.user, { foreignKey : 'user_id' });
 
-db.users.hasMany(db.orders, { foreignKey : 'user_id' });
-db.orders.belongsTo(db.users, { foreignKey : 'user_id' });
+db.restaurant.hasMany(db.dish, { foreignKey: 'restaurant_id' });
+db.dish.belongsTo(db.restaurant, { foreignKey: 'restaurant_id' });
 
-db.dishes.belongsToMany(db.orders, {
+db.user.hasMany(db.order, { foreignKey : 'user_id' });
+db.order.belongsTo(db.user, { foreignKey : 'user_id' });
+
+//2. Many to Many relationships
+db.dish.belongsToMany(db.order, {
     through: "order_dish",
     as: "orders",
     foreignKey: "dish_id",
 });
-db.orders.belongsToMany(db.dishes, {
+db.order.belongsToMany(db.dish, {
     through: "order_dish",
     as: "dishes",
     foreignKey: "order_id",
 });
 
-db.restaurants.belongsToMany(db.categories, {
+db.restaurant.belongsToMany(db.category, {
     through: "category_restaurant",
-    as: "categories",
     foreignKey: "restaurant_id",
 });
-db.categories.belongsToMany(db.restaurants, {
+db.category.belongsToMany(db.restaurant, {
     through: "category_restaurant",
-    as: "restaurants",
     foreignKey: "category_id",
 });
 
