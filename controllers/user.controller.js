@@ -71,7 +71,7 @@ exports.signup = async (req, res) => {
 // Allow User to Login
 exports.signin = (req, res) => {
     // Validate request
-    if (!req.body.email || !req.body.password) {
+    if (!req.body.phone) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
@@ -80,7 +80,7 @@ exports.signin = (req, res) => {
 
     Users.findOne({
         where: {
-            email: req.body.email
+            phone: req.body.phone
         }
     }).then(user => {
         if (!user) {
@@ -90,20 +90,17 @@ exports.signin = (req, res) => {
             });
         }
 
-        let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-        if (!passwordIsValid) {
-            return res.status(401).send({
-                auth: false,
-                accessToken: null,
-                message: "Invalid Password!"
-            });
-        }
-
         let token = jwt.sign({ id: user.id, role: ROLES.DEFAULT }, jwtConfig.JWT_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
         res.status(200).send({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone
+            },
             auth: true,
             accessToken: token
         });
