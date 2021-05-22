@@ -28,11 +28,7 @@ module.exports = (sequelize, DataTypes) => {
                     return value;
                 }
             }
-        },
-        password: {
-            type : DataTypes.STRING,
-            allowNull: false
-        },
+        }
     },
     {
         freezeTableName: true
