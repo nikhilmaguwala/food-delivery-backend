@@ -48,12 +48,10 @@ db.order.belongsTo(db.user, { foreignKey : 'user_id' });
 //2. Many to Many relationships
 db.dish.belongsToMany(db.order, {
     through: "order_dish",
-    as: "orders",
     foreignKey: "dish_id",
 });
 db.order.belongsToMany(db.dish, {
     through: "order_dish",
-    as: "dishes",
     foreignKey: "order_id",
 });
 

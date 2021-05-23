@@ -203,7 +203,6 @@ exports.createByLink = async (req, res) => {
                                 message: "Some error occurred while Adding the Scraped Categories.",
                                 description: err
                             });
-                            return;
                         });
                 }
             }).catch((err) => {
@@ -211,7 +210,6 @@ exports.createByLink = async (req, res) => {
                     message: "Some error occurred while Adding the Scraped Categories.",
                     description: err
                 });
-                return;
             });
         });
 
@@ -222,8 +220,7 @@ exports.createByLink = async (req, res) => {
             rating: parseFloat(restaurant.rating),
             city: restaurant.city,
             partnerId: req.partnerId,
-            image_url: restaurant.image,
-            categories: restaurant.categories.map(category => ({ "name": category }))
+            image_url: restaurant.image
         };
 
         // Save Restaurant in the database
@@ -237,14 +234,11 @@ exports.createByLink = async (req, res) => {
                         }
                     }).then(async (category) => {
                         await newRes.addCategory(category);
-                        console.log(`Assigning: ${newRes.dataValues.name} -> ${category.dataValues.name}`)
                     }).catch((err) => {
-                        console.log(err)
                         return res.status(500).send({
                             message: "Some error occurred while Adding category to the Scraped Restaurant.",
                             description: err
                         });
-                        return;
                     });
 
                 });
@@ -253,7 +247,6 @@ exports.createByLink = async (req, res) => {
                     message: "Some error occurred while Adding the Scraped Restaurant.",
                     description: err
                 });
-                return;
             });
     }
 
@@ -292,12 +285,10 @@ exports.createByLink = async (req, res) => {
                     message: "Some error occurred while Adding the scraped Dish.",
                     description: err
                 });
-                return;
             });
     })
 
     return res.status(200).send({
         message: "Adding Restaurant is Successful..!"
     });
-    return;
 }
