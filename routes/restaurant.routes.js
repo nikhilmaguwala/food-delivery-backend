@@ -31,5 +31,5 @@ module.exports = app => {
     // Create a new Restaurant
     router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.deleteAll);
 
-    app.use('/api/restaurants', router);
+    app.use('/api/restaurant', router);
 };
