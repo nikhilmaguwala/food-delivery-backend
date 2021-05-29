@@ -28,7 +28,7 @@ module.exports = app => {
     // Delete a Restaurant with id
     router.delete("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.delete);
 
-    // Create a new Restaurant
+    // Delete all Restaurants
     router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.deleteAll);
 
     app.use('/api/restaurant', router);

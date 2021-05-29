@@ -22,7 +22,7 @@ module.exports = app => {
     // Delete a Category with id
     router.delete("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], category.delete);
 
-    // Create a new Category
+    // Delete all Categories
     router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], category.deleteAll);
 
     app.use('/api/category', router);

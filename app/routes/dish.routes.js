@@ -22,7 +22,7 @@ module.exports = app => {
     // Delete a Dish with id
     router.delete("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], dish.delete);
 
-    // Create a new Dish
+    // Delete all Dishes
     router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], dish.deleteAll);
 
     app.use('/api/dish', router);

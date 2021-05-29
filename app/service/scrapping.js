@@ -132,7 +132,7 @@ const scrapRestaurant = async (url) => {
                 const location = document.querySelector('h1.sc-7kepeu-0:nth-child(1)').parentElement.parentElement.children[1].children[1].textContent;
                 const image = document.querySelector('.s1isp7-5').src;
 
-                const item_class_nodes = document.querySelectorAll('.sc-iVOTot');
+                const item_class_nodes = document.querySelectorAll('.SnWUh');
                 const items = Array.from(item_class_nodes).map((item_node) => {
                     return Array.from(item_node.nextSibling.childNodes).map((item) => {
                         if (item.tagName !== 'P') {

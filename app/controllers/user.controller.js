@@ -1,23 +1,22 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 
 const db = require("../models");
 const jwtConfig = require("../config/jwt.config");
 const { ROLES } = require("../utilities/constants");
 
-const Users = db.user;
+const User = db.user;
 
 // Create and Save a new User
 exports.signup = async (req, res) => {
     // Validate request
-    if (!req.body.name || !req.body.email || !req.body.phone || !req.body.password) {
+    if (!req.body.name || !req.body.email || !req.body.phone) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
         return;
     }
 
-    Users.findOne({
+    User.findOne({
         where: {
             email: req.body.email
         }
@@ -28,7 +27,7 @@ exports.signup = async (req, res) => {
             });
             return;
         } else {
-            Users.findOne({
+            User.findOne({
                 where: {
                     phone: req.body.phone
                 }
@@ -43,12 +42,11 @@ exports.signup = async (req, res) => {
                     const user = {
                         name: req.body.name,
                         email: req.body.email,
-                        phone: req.body.phone,
-                        password: bcrypt.hashSync(req.body.password)
+                        phone: req.body.phone
                     }
 
                     // Save Users in the database
-                    Users.create(user)
+                    User.create(user)
                         .then(data => {
                             res.send({
                                 name: data.name,
@@ -69,7 +67,7 @@ exports.signup = async (req, res) => {
 };
 
 // Allow User to Login
-exports.signin = (req, res) => {
+exports.signin = async (req, res) => {
     // Validate request
     if (!req.body.phone) {
         res.status(400).send({
@@ -78,11 +76,13 @@ exports.signin = (req, res) => {
         return;
     }
 
-    Users.findOne({
-        where: {
-            phone: req.body.phone
-        }
-    }).then(user => {
+    try {
+        const user = await User.findOne({
+            where: {
+                phone: req.body.phone
+            }
+        })
+
         if (!user) {
             return res.status(404).send({
                 auth: false,
@@ -104,11 +104,55 @@ exports.signin = (req, res) => {
             auth: true,
             accessToken: token
         });
-
-    }).catch(err => {
+    }
+    catch (err) {
         res.status(500).send({
             message: 'Something went wrong.',
             description: err
         });
-    });
+    }
 }
+
+// Delete a User with the specified id in the request
+exports.delete = (req, res) => {
+    const id = req.params.id;
+
+    User.destroy({
+        where: { id: id }
+    })
+        .then(num => {
+            if (num === 1) {
+                res.send({
+                    message: "User was deleted successfully!"
+                });
+            } else {
+                res.send({
+                    message: `Cannot delete User with id=${id}. Maybe User was not found!`
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Could not delete User with id=" + id,
+                description: err
+            });
+        });
+};
+
+// Delete all Users from the database.
+exports.deleteAll = (req, res) => {
+    User.destroy({
+        where: {},
+        truncate: false
+    })
+        .then(nums => {
+            res.send({ message: `${nums} Users were deleted successfully!` });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Some error occurred while removing all Users.",
+                description: err
+            });
+        });
+};
+

@@ -121,3 +121,46 @@ exports.signin = (req, res) => {
         });
     });
 }
+
+// Delete a Partner with the specified id in the request
+exports.delete = (req, res) => {
+    const id = req.params.id;
+
+    Partner.destroy({
+        where: { id: id }
+    })
+        .then(num => {
+            if (num === 1) {
+                res.send({
+                    message: "Partner was deleted successfully!"
+                });
+            } else {
+                res.send({
+                    message: `Cannot delete Partner with id=${id}. Maybe Partner was not found!`
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Could not delete Partner with id=" + id,
+                description: err
+            });
+        });
+};
+
+// Delete all Partners from the database.
+exports.deleteAll = (req, res) => {
+    Partner.destroy({
+        where: {},
+        truncate: false
+    })
+        .then(nums => {
+            res.send({ message: `${nums} Partners were deleted successfully!` });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Some error occurred while removing all Partners.",
+                description: err
+            });
+        });
+};
