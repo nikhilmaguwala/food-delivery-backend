@@ -19,9 +19,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = require("./models");
-db.sequelize.sync({ force: true })
-    .then(() => { console.log('Dropped DB and Re-sync It'); })
-    .catch((err) => { console.log('Already Synced or Failed to Sync.')  });
+// db.sequelize.sync({ force: true })
+//     .then(() => { console.log('Dropped DB and Re-sync It'); })
+//     .catch((err) => { console.log(`Failed to Sync: ${err}`)  });
 
 // simple route
 app.get("/", (req, res) => {
@@ -35,6 +35,7 @@ require("./routes/user.routes")(app);
 require("./routes/partner.routes")(app);
 require("./routes/category.routes")(app);
 require("./routes/order.routes")(app);
+require("./routes/address.routes")(app);
 require("./routes/db.routes")(app);
 
 // set port, listen for requests

@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     },
     {
-        freezeTableName: true
+        freezeTableName: true,
+        underscored: true
     });
 };

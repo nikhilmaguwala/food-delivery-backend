@@ -84,7 +84,7 @@ exports.findOne = (req, res) => {
             if(!data)
             {
                 res.status(404).send({
-                    message: `Dish with id=${id}was not found`
+                    message: `Dish with id=${id} was not found`
                 });
             }
             else {

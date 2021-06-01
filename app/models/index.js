@@ -45,6 +45,8 @@ db.dish.belongsTo(db.restaurant, { foreignKey: 'restaurant_id' });
 db.user.hasMany(db.order, { foreignKey : 'user_id' });
 db.order.belongsTo(db.user, { foreignKey : 'user_id' });
 
+db.order.belongsTo(db.address, { foreignKey : 'address_id' });
+
 //2. Many to Many relationships
 db.dish.belongsToMany(db.order, {
     through: "order_dish",

@@ -20,10 +20,9 @@ exports.create = async (req, res) => {
     })
 
     if(existCategory) {
-        res.status(400).send({
+        return res.status(400).send({
             message: "Category already exist"
         });
-        return;
     }
 
     // Create a Category
