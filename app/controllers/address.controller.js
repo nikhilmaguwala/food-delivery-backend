@@ -4,7 +4,7 @@ const Address = db.address;
 // Create and Save a new Address
 exports.create = async (req, res) => {
     // Validate request
-    if (!req.body.alias || !req.body.landmark || !req.body.location) {
+    if (!req.body.alias || !req.body.landmark || !req.body.location || !req.body.type || !req.body.longitude || !req.body.latitude) {
         return res.status(400).send({
             message: "Content can not be empty!"
         });
@@ -27,8 +27,11 @@ exports.create = async (req, res) => {
     const address = {
         alias: req.body.alias.toUpperCase(),
         landmark: req.body.landmark,
+        type: req.body.type,
         location: req.body.location,
-        user_id: req.userId
+        user_id: req.userId,
+        longitude: req.body.longitude,
+        latitude: req.body.latitude
     };
 
     // Save Address in the database
@@ -49,7 +52,6 @@ exports.findAll = async (req, res) => {
     try {
         const data = await Address.findAll({ where: {} });
         return res.send(data);
-
     }
     catch (err) {
         return res.status(500).send({
@@ -109,6 +111,7 @@ exports.update = async (req, res) => {
     const id = req.params.id;
 
     req.body.alias = req.body.alias.toUpperCase();
+
     try {
         const data = await Address.update(req.body, {
             where: { id: id }
