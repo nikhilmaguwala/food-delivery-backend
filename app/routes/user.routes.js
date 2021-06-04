@@ -15,5 +15,8 @@ module.exports = app => {
     // Delete all Users
     router.delete("/", user.deleteAll);
 
+    // get 3 recent food-items searched by user
+    router.get("/recent-search", user.recentSearch);
+
     app.use('/api/user', router);
 };
