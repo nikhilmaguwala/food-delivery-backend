@@ -44,6 +44,10 @@ module.exports = (sequelize, DataTypes) => {
         panCard: {
             type : DataTypes.STRING,
             allowNull: false
+        }, 
+        created_at : {
+            type: Date, 
+            default : Date.now()
         }
     },
     {

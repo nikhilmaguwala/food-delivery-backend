@@ -158,17 +158,18 @@ exports.deleteAll = (req, res) => {
 };
 
 // Allow user to get recent Search
-exports.recentSearch = (req, res) => {
+exports.recentSearch = async(req, res) => {
     try {
         const id = req.params.id
         // const text = " select * from orders where orders.customer_id = $1 order by created_at desc limit 5"
 
         const data = await Order.find({order_id: id}).sort({created_at:-1}).limit(3);
-        if (data.rows) {
-            res.json(data.rows);
+        if (data.rows > 0) {
+            res.status(200).json(data.rows);
         }
         else {
-            res.send({ message: `Search data fetched successfully!` });
+            res.status(400).send({ 
+                message: `No datas available to fetch !!` });
         }
     } catch (err) {
         res.status(500).send({

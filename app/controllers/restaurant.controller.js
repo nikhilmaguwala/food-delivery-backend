@@ -32,7 +32,7 @@ exports.create = async (req, res) => {
     // Create a Restaurant
     const restaurant = {
         name: req.body.name,
-        category: 'req.body.category',
+        category: req.body.category,
         location: req.body.location,
         rating: req.body.rating,
         partnerId: req.partnerId
@@ -45,8 +45,7 @@ exports.create = async (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while Adding the Restaurant."
+                message: err.message || "Some error occurred while Adding the Restaurant."
             });
         });
 };
@@ -291,4 +290,28 @@ exports.createByLink = async (req, res) => {
     return res.status(200).send({
         message: "Adding Restaurant is Successful..!"
     });
+}
+
+exports.toggleAcceptingOrder = async(req, res) => {
+    const restaurantId = req.body.restaurant_id;
+    try {
+        const restaurant = await Restaurant.findById(restaurantId);
+        if(!restaurant) {
+            res.status(400).send({
+                message: "Restaurant doesn't exists!! "
+            })
+        } else {
+            restaurant.accept_order = !restaurant.accept_order; // toggling accept_order button
+            res.status(200).send({
+                message: "Accept_Order toggled successfully"
+            })
+        }
+    
+    } catch (err) {
+        return res.status(500).send({
+            message: 'Some error occurred in Changing Accept_Order Option.',
+            description: err
+        });
+    }
+    
 }

@@ -9,6 +9,7 @@ module.exports = app => {
 
     // Create a new Restaurant
     router.post("/",[authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.create);
+    // router.post("/create-restaurant", restaurant.create);
 
     // Retrieve all Restaurants
     // router.get("/", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findAll);
@@ -30,6 +31,8 @@ module.exports = app => {
 
     // Delete all Restaurants
     router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.deleteAll);
+
+    router.put("/restaurant/toggle_accept", restaurant.toggleAcceptingOrder);
 
     app.use('/api/restaurant', router);
 };

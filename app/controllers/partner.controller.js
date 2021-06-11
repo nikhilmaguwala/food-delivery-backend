@@ -164,3 +164,77 @@ exports.deleteAll = (req, res) => {
             });
         });
 };
+
+// Update a Partner by the id in the request
+exports.update = (req, res) => {
+    const id = req.params.id;
+
+    Partner.update(req.body, {
+        where: { id: id }
+    })
+        .then(num => {
+            if (num[0] === 1) {
+                res.status(200).send({
+                    message: "Partner was updated successfully."
+                });
+            } else {
+                res.status(400).send({
+                    message: `Cannot update Partner with id=${id}. Maybe Partner was not found or req.body is empty!`
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error updating Partner with id=" + id,
+                description: err
+            });
+        });
+};
+
+
+// Retrieve all the Partners from the database.
+exports.getAll = (req, res) => {
+    const title = req.query.name;
+    const condition = title ? { name: { [Op.iLike]: `%${title}%` } } : null;
+
+    Partner.findAll({ where: condition })
+        .then(data => {
+            res.status(200).send(data);
+        })
+        .catch(err => {
+            return res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving Partners.",
+                    description: err
+            });
+        });
+};
+
+// Find a particular Partner with an id
+exports.getOne = (req, res) => {
+    const id = req.params.id;
+
+    Partner.findOne({
+        where: { id: id },
+        include: [{
+            model: Dish
+        }]
+    }).then(data => {
+        if (!data) {
+            res.status(404).send({
+                message: `Partner with id=${id} was not found`
+            });
+        }
+        else {
+            res.status(200).send(data);
+        }
+    })
+        .catch(err => {
+            console.log("hel" + err)
+            res.status(500).send({
+                message: "Error retrieving Partner with id=" + id,
+                description: err
+            });
+        });
+};
+

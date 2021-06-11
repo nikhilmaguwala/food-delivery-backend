@@ -15,5 +15,14 @@ module.exports = app => {
     // Delete all Partners
     router.delete("/", partner.deleteAll);
 
+    // Retrieve all the Partners from a database
+    router.get("/", partner.getAll);
+
+    // Retrieve a particular Partner from a database
+    router.get("/:id", partner.getOne);
+
+    // Update a Partner
+    router.update("/:id", partner.update);
+
     app.use('/api/partner', router);
 };

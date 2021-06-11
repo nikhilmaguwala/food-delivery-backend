@@ -3,6 +3,7 @@ const db = require("../models");
 const Dish = db.dish;
 const Order = db.order;
 const Address = db.address;
+const Restaurant = db.restaurant;
 
 // Create and Save a new Order
 exports.create = async (req, res) => {
@@ -175,3 +176,12 @@ exports.deleteAll = async (req, res) => {
         });
     }
 };
+
+// exports.processOrder = async(req, res) => {
+
+//     const orderId = req.body.order_id;
+//     const restaurantId = req.body.restaurant_id;
+
+//     const restaurant = await Restaurant.findById(restaurantId);
+
+// }
