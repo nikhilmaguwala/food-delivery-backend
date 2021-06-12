@@ -4,6 +4,7 @@ const Restaurant = db.restaurant;
 const Category = db.category;
 const Dish = db.dish;
 const Op = db.Sequelize.Op;
+const Order = db.order;
 const scrapRestaurant = require('../service/scrapping');
 
 // Create and Save a new Restaurant
@@ -292,16 +293,24 @@ exports.createByLink = async (req, res) => {
     });
 }
 
+// toggle accept-order
 exports.toggleAcceptingOrder = async(req, res) => {
     const restaurantId = req.body.restaurant_id;
+
     try {
-        const restaurant = await Restaurant.findById(restaurantId);
+
+        const restaurant = await Restaurant.find({
+            id: restaurantId
+        })
+
         if(!restaurant) {
             res.status(400).send({
                 message: "Restaurant doesn't exists!! "
             })
+            
         } else {
             restaurant.accept_order = !restaurant.accept_order; // toggling accept_order button
+            
             res.status(200).send({
                 message: "Accept_Order toggled successfully"
             })
@@ -314,4 +323,73 @@ exports.toggleAcceptingOrder = async(req, res) => {
         });
     }
     
+}
+
+
+// retrieve orders of a restaurant * order status and restaurant_id is given
+exports.retriveOrders = async (req, res) => {
+    const restaurantId = req.params.id; // getting restaurant Id
+    const status = req.params.status; // pending orders or completed orders
+
+    if (status !== "received" && status !== "preparing" && status !== "packing" && status !== "out_for_delivery" && status !== "completed" && status!== null) {     // null status means all the orders
+        return res.status(400).send({
+            message:
+                "Invalid status"
+        });
+
+    }
+    
+    if(status === null) {
+        try {
+            const data = await Order.find({
+                where: {
+                    restaurant_id: restaurantId
+                }
+            })
+
+            if (data.rows > 0) {
+                console.log(data);
+                return res.status(200).json(data);
+            } else {
+                return res.status(400).send({
+                    message:
+                        "No orders are available right now. Wait for the next Order."
+                });
+            }
+
+        } catch (err) {
+            return res.status(500).send({
+                message: `Some error occurred in retrieving ${status} orders.`,
+                description: err
+            });
+        }
+    }
+
+    else{
+        try {
+            const data = await Order.find({
+                where: {
+                    status: status,
+                    restaurant_id: restaurantId
+                }
+            })
+
+            if (data.rows > 0) {
+                console.log(data);
+                return res.status(200).json(data);
+            } else {
+                return res.status(400).send({
+                    message:
+                        "No orders are available right now. Wait for the next Order."
+                });
+            }
+
+        } catch (err) {
+            return res.status(500).send({
+                message: `Some error occurred in retrieving ${status} orders.`,
+                description: err
+            });
+        }
+    }
+
 }

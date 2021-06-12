@@ -215,10 +215,7 @@ exports.getOne = (req, res) => {
     const id = req.params.id;
 
     Partner.findOne({
-        where: { id: id },
-        include: [{
-            model: Dish
-        }]
+        where: { id: id }
     }).then(data => {
         if (!data) {
             res.status(404).send({
@@ -230,7 +227,7 @@ exports.getOne = (req, res) => {
         }
     })
         .catch(err => {
-            console.log("hel" + err)
+            console.log(err)
             res.status(500).send({
                 message: "Error retrieving Partner with id=" + id,
                 description: err

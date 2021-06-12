@@ -22,7 +22,7 @@ module.exports = app => {
     router.get("/:id", partner.getOne);
 
     // Update a Partner
-    router.update("/:id", partner.update);
+    router.put("/:id", partner.update);
 
     app.use('/api/partner', router);
 };

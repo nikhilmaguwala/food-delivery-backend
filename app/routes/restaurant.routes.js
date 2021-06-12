@@ -32,7 +32,11 @@ module.exports = app => {
     // Delete all Restaurants
     router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.deleteAll);
 
+    // toggling accept-order option
     router.put("/restaurant/toggle_accept", restaurant.toggleAcceptingOrder);
+
+    // retrieve orders of a restaurant
+    router.get("/:id.:status", restaurant.retriveOrders);
 
     app.use('/api/restaurant', router);
 };

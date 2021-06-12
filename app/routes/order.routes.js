@@ -22,5 +22,8 @@ module.exports = app => {
     // Delete all Orders
     router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], order.deleteAll);
 
+    // process an order (changing it's status)
+    router.put("/:id.:status", order.processOrder);
+
     app.use('/api/order', router);
 };

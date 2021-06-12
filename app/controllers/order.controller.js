@@ -8,7 +8,7 @@ const Restaurant = db.restaurant;
 // Create and Save a new Order
 exports.create = async (req, res) => {
     // Validate request
-    if (!req.body.dishes || !req.body.order_price || !req.body.delivery_price || !req.body.tax_price || !req.body.total_price || !req.body.address_id) {
+    if (!req.body.dishes || !req.body.order_price || !req.body.delivery_price || !req.body.tax_price || !req.body.total_price || !req.body.address_id || !req.body.restaurant_id) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
@@ -30,7 +30,8 @@ exports.create = async (req, res) => {
             tax_price: req.body.tax_price,
             total_price: req.body.total_price,
             user_id: req.userId,
-            address_id: req.body.address_id
+            address_id: req.body.address_id,
+            restaurant_id: req.body.restaurant_id
         };
 
         const dishes = []
@@ -177,11 +178,45 @@ exports.deleteAll = async (req, res) => {
     }
 };
 
-// exports.processOrder = async(req, res) => {
 
-//     const orderId = req.body.order_id;
-//     const restaurantId = req.body.restaurant_id;
+// process an order of a restaurant * order status and restaurant_id is given
+exports.processOrder = async (req, res) => {
+    const restaurantId = req.params.id; // getting restaurant Id
+    const status = req.params.status; // pending orders or completed orders
 
-//     const restaurant = await Restaurant.findById(restaurantId);
+    if (status !== "received" && status !== "preparing" && status !== "packing" && status !== "out_for_delivery" && status !== "completed") {
+        return res.status(400).send({
+            message:
+                "Invalid status"
+        });
+    }
 
-// }
+    try {
+        const data = await Order.update(req.body.status, {
+            where: {
+                status: status,
+                restaurant_id: restaurantId
+            }
+        })
+
+        if (data[0] === 1) {
+            console.log(data);
+            return res.status(200).send({
+                message:
+                    "Order status changed successfully."
+            })
+        } else {
+            return res.status(400).send({
+                message:
+                    "No orders are available right now. Wait for the next Order."
+            });
+        }
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Some error occurred in retrieving ${status} orders.`,
+            description: err
+        });
+    }
+
+}
