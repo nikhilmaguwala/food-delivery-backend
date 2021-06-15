@@ -295,30 +295,37 @@ exports.createByLink = async (req, res) => {
 
 // toggle accept-order
 exports.toggleAcceptingOrder = async(req, res) => {
-    const restaurantId = req.body.restaurant_id;
+    const restaurantId = req.params.restaurant_id;
 
     try {
 
-        const restaurant = await Restaurant.find({
-            id: restaurantId
+        const updated = await Restaurant.update({accept_order: !accept_order}, {
+            where: {
+                _id: restaurantId
+            }
         })
 
-        if(!restaurant) {
+        if(!updated) {
             res.status(400).send({
-                message: "Restaurant doesn't exists!! "
+                success: false,
+                message: 
+                    "Restaurant doesn't exists!! "
             })
             
         } else {
-            restaurant.accept_order = !restaurant.accept_order; // toggling accept_order button
             
             res.status(200).send({
-                message: "Accept_Order toggled successfully"
+                success: true,
+                message: 
+                    "Accept_Order toggled successfully"
             })
         }
     
     } catch (err) {
         return res.status(500).send({
-            message: 'Some error occurred in Changing Accept_Order Option.',
+            success: false,
+            message: 
+                'Some error occurred in Changing Accept_Order Option.',
             description: err
         });
     }
@@ -327,7 +334,7 @@ exports.toggleAcceptingOrder = async(req, res) => {
 
 
 // retrieve orders of a restaurant * order status and restaurant_id is given
-exports.retriveOrders = async (req, res) => {
+exports.retrieveOrders = async (req, res) => {
     const restaurantId = req.params.id; // getting restaurant Id
     const status = req.params.status; // pending orders or completed orders
 
@@ -390,6 +397,37 @@ exports.retriveOrders = async (req, res) => {
                 description: err
             });
         }
+    }
+
+}
+
+exports.pastOrders = async(req, res) => {
+
+    const restaurantId = req.params.id;
+
+    try {
+        const data = await Order.find({
+            restaurant_id: restaurantId,
+            created_at: {
+                $gte: req.body.startDate,
+                $lt: req.body.endDate
+            }
+        })
+        if(data.length === 0){
+            res.send({
+                message:
+                    `No Orders found between ${req.body.startDate} and ${req.body.endDate}.`
+            })
+        }
+        else{
+            res.status(200).json(data);
+        }
+    
+    } catch (err) {
+        return res.status(500).send({
+            message: 'Some error occurred.',
+            description: err
+        });
     }
 
 }

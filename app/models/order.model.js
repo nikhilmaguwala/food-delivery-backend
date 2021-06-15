@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         status: {
             type: DataTypes.STRING, // completed or pending
             default: "pending"
+        },
+        created_at: {
+            type: Date,
+            default : Date.now()
         }
     },
     {
