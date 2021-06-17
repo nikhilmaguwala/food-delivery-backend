@@ -332,7 +332,6 @@ exports.toggleAcceptingOrder = async(req, res) => {
     
 }
 
-
 // retrieve orders of a restaurant * order status and restaurant_id is given
 exports.retrieveOrders = async (req, res) => {
     const restaurantId = req.params.id; // getting restaurant Id
@@ -401,6 +400,7 @@ exports.retrieveOrders = async (req, res) => {
 
 }
 
+// retrieve Orders for the given Date Interval
 exports.pastOrders = async(req, res) => {
 
     const restaurantId = req.params.id;

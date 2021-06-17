@@ -178,7 +178,6 @@ exports.deleteAll = async (req, res) => {
     }
 };
 
-
 // process an order of a restaurant * order status and restaurant_id is given
 exports.processOrder = async (req, res) => {
     const restaurantId = req.params.id; // getting restaurant Id

@@ -38,6 +38,7 @@ module.exports = app => {
     // retrieve orders of a restaurant
     router.get("/:id.:status", restaurant.retrieveOrders);
 
+    // retrieve pastOrders for a given date interval
     router.get("/:id/pastOrders", restaurant.pastOrders);
 
     app.use('/api/restaurant', router);
