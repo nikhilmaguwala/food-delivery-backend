@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define("order", {
+    return sequelize.define("orders", {
         order_price: {
             type: DataTypes.FLOAT,
             allowNull: false,
@@ -17,16 +17,12 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         restaurant_id: {
-            type: DataTypes.STRING,
+            type: DataTypes.FLOAT,
             allowNull: false // require: true
         },
         status: {
             type: DataTypes.STRING, // completed or pending
-            default: "pending"
-        },
-        created_at: {
-            type: Date,
-            default : Date.now()
+            defaultValue: "received"
         }
     },
     {

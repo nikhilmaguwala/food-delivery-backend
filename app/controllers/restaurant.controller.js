@@ -294,38 +294,55 @@ exports.createByLink = async (req, res) => {
 }
 
 // toggle accept-order
-exports.toggleAcceptingOrder = async(req, res) => {
-    const restaurantId = req.params.restaurant_id;
+exports.toggleAcceptOrder = async(req, res) => {
+    const restaurantId = req.params.id;
 
     try {
-
-        const updated = await Restaurant.update({accept_order: !accept_order}, {
+        const before = await Restaurant.findOne({
             where: {
-                _id: restaurantId
+                id: restaurantId
             }
-        })
+        });
 
-        if(!updated) {
+        if (!before.dataValues) {
             res.status(400).send({
                 success: false,
-                message: 
+                message:
                     "Restaurant doesn't exists!! "
             })
-            
+
         } else {
-            
-            res.status(200).send({
-                success: true,
-                message: 
-                    "Accept_Order toggled successfully"
+
+            const previousState = before.dataValues.accepts_order;
+
+            const updated = await Restaurant.update({ accepts_order: !previousState }, {
+                where: {
+                    id: restaurantId
+                }
             })
+
+            if (!updated) {
+                res.status(400).send({
+                    success: false,
+                    message:
+                        "Some Problem occurred while changing toggle."
+                })
+
+            } else {
+
+                res.status(200).send({
+                    success: true,
+                    message:
+                        `Accepts_Order changed to ${!previousState} toggled successfully`
+                })
+            }
         }
     
     } catch (err) {
         return res.status(500).send({
             success: false,
             message: 
-                'Some error occurred in Changing Accept_Order Option.',
+                'Some error occurred in Changing Accepts_Order Option.',
             description: err
         });
     }
@@ -335,9 +352,9 @@ exports.toggleAcceptingOrder = async(req, res) => {
 // retrieve orders of a restaurant * order status and restaurant_id is given
 exports.retrieveOrders = async (req, res) => {
     const restaurantId = req.params.id; // getting restaurant Id
-    const status = req.params.status; // pending orders or completed orders
+    const currentStatus = req.params.status; // pending orders or completed orders
 
-    if (status !== "received" && status !== "preparing" && status !== "packing" && status !== "out_for_delivery" && status !== "completed" && status!== null) {     // null status means all the orders
+    if (currentStatus !== "received" && currentStatus !== "preparing" && currentStatus !== "packing" && currentStatus !== "out_for_delivery" && currentStatus !== "completed" && currentStatus!== "all") {     // null status means all the orders
         return res.status(400).send({
             message:
                 "Invalid status"
@@ -345,7 +362,7 @@ exports.retrieveOrders = async (req, res) => {
 
     }
     
-    if(status === null) {
+    if (currentStatus === "all") {
         try {
             const data = await Order.find({
                 where: {
@@ -353,9 +370,10 @@ exports.retrieveOrders = async (req, res) => {
                 }
             })
 
-            if (data.rows > 0) {
+            if (!data) {
                 console.log(data);
                 return res.status(200).json(data);
+                
             } else {
                 return res.status(400).send({
                     message:
@@ -365,7 +383,7 @@ exports.retrieveOrders = async (req, res) => {
 
         } catch (err) {
             return res.status(500).send({
-                message: `Some error occurred in retrieving ${status} orders.`,
+                message: `Some error occurred in retrieving ${currentStatus} orders.`,
                 description: err
             });
         }
@@ -375,12 +393,13 @@ exports.retrieveOrders = async (req, res) => {
         try {
             const data = await Order.find({
                 where: {
-                    status: status,
-                    restaurant_id: restaurantId
+                    // restaurant_id: restaurantId
                 }
             })
 
-            if (data.rows > 0) {
+            console.log(data);
+            
+            if (data.length > 0) {
                 console.log(data);
                 return res.status(200).json(data);
             } else {
@@ -392,7 +411,7 @@ exports.retrieveOrders = async (req, res) => {
 
         } catch (err) {
             return res.status(500).send({
-                message: `Some error occurred in retrieving ${status} orders.`,
+                message: `Some error occurred in retrieving ${currentStatus} orders.`,
                 description: err
             });
         }

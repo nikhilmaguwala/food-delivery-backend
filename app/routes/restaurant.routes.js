@@ -8,7 +8,7 @@ module.exports = app => {
     const router = require("express").Router();
 
     // Create a new Restaurant
-    router.post("/",[authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.create);
+    router.post("/",/* [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], */ restaurant.create);
     // router.post("/create-restaurant", restaurant.create);
 
     // Retrieve all Restaurants
@@ -24,19 +24,19 @@ module.exports = app => {
     router.get("/:id", restaurant.findOne);
 
     // Update a Restaurant with id
-    router.put("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.update);
+    router.put("/:id", /* [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], */ restaurant.update);
 
     // Delete a Restaurant with id
-    router.delete("/:id", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.delete);
+    router.delete("/:id", /* [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], */ restaurant.delete);
 
     // Delete all Restaurants
-    router.delete("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.deleteAll);
+    router.delete("/", /* [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], */ restaurant.deleteAll);
 
     // toggling accept-order option
-    router.put("/:id/toggle_accept", restaurant.toggleAcceptingOrder);
+    router.put("/:id/toggle", restaurant.toggleAcceptOrder);
 
     // retrieve orders of a restaurant
-    router.get("/:id.:status", restaurant.retrieveOrders);
+    router.get("/:id/:status", restaurant.retrieveOrders);
 
     // retrieve pastOrders for a given date interval
     router.get("/:id/pastOrders", restaurant.pastOrders);

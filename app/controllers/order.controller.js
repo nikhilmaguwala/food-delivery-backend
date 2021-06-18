@@ -8,7 +8,8 @@ const Restaurant = db.restaurant;
 // Create and Save a new Order
 exports.create = async (req, res) => {
     // Validate request
-    if (!req.body.dishes || !req.body.order_price || !req.body.delivery_price || !req.body.tax_price || !req.body.total_price || !req.body.address_id || !req.body.restaurant_id) {
+    if (!req.body.dishes || !req.body.order_price || !req.body.delivery_price || !req.body.tax_price || !req.body.total_price /* || !req.body.address_id */ ||  !req.body.restaurant_id) {
+        
         res.status(400).send({
             message: "Content can not be empty!"
         });
@@ -17,19 +18,19 @@ exports.create = async (req, res) => {
 
     const address = await Address.findOne({
         where: {
-            id: req.body.address_id,
-            user_id: req.userId
+            // id: req.body.address_id,
+            user_id: req.body.userId
         }
     });
 
-    if (address) {
+    if (!address) {
         // Create a Order
         const order = {
             order_price: req.body.order_price,
             delivery_price: req.body.delivery_price,
             tax_price: req.body.tax_price,
             total_price: req.body.total_price,
-            user_id: req.userId,
+            user_id: req.body.userId,
             address_id: req.body.address_id,
             restaurant_id: req.body.restaurant_id
         };
@@ -179,43 +180,68 @@ exports.deleteAll = async (req, res) => {
 };
 
 // process an order of a restaurant * order status and restaurant_id is given
-exports.processOrder = async (req, res) => {
-    const restaurantId = req.params.id; // getting restaurant Id
-    const status = req.params.status; // pending orders or completed orders
+// exports.processOrder = async (req, res) => {
+//     const restaurantId = req.params.id; // getting restaurant Id
+//     const status = req.params.status; // pending orders or completed orders
 
-    if (status !== "received" && status !== "preparing" && status !== "packing" && status !== "out_for_delivery" && status !== "completed") {
-        return res.status(400).send({
-            message:
-                "Invalid status"
-        });
-    }
+//     if (status !== "received" && status !== "preparing" && status !== "packing" && status !== "out_for_delivery" && status !== "completed") {
+//         return res.status(400).send({
+//             message:
+//                 "Invalid status"
+//         });
+//     }
 
-    try {
-        const data = await Order.update(req.body.status, {
-            where: {
-                status: status,
-                restaurant_id: restaurantId
+//     try {
+//         const data = await Order.update(req.body.status, {
+//             where: {
+//                 status: status,
+//                 restaurant_id: restaurantId
+//             }
+//         })
+
+//         if (data[0] === 1) {
+//             console.log(data);
+//             return res.status(200).send({
+//                 message:
+//                     "Order status changed successfully."
+//             })
+//         } else {
+//             return res.status(400).send({
+//                 message:
+//                     "No orders are available right now. Wait for the next Order."
+//             });
+//         }
+
+//     } catch (err) {
+//         return res.status(500).send({
+//             message: `Some error occurred in retrieving ${status} orders.`,
+//             description: err
+//         });
+//     }
+
+// }
+
+// Update a Order by the id in the request | This also includes processing order
+exports.update = (req, res) => {
+    const id = req.params.id;
+
+    Order.update(req.body, {
+        where: { id: id }
+    })
+        .then(num => {
+            if (num[0] === 1) {
+                res.send({
+                    message: "Order was updated successfully."
+                });
+            } else {
+                res.send({
+                    message: `Cannot update Order with id=${id}. Maybe Order was not found or req.body is empty!`
+                });
             }
         })
-
-        if (data[0] === 1) {
-            console.log(data);
-            return res.status(200).send({
-                message:
-                    "Order status changed successfully."
-            })
-        } else {
-            return res.status(400).send({
-                message:
-                    "No orders are available right now. Wait for the next Order."
+        .catch(err => {
+            res.status(500).send({
+                message: "Error updating Order with id=" + id
             });
-        }
-
-    } catch (err) {
-        return res.status(500).send({
-            message: `Some error occurred in retrieving ${status} orders.`,
-            description: err
         });
-    }
-
-}
+};
