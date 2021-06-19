@@ -377,7 +377,7 @@ exports.retrieveOrders = async (req, res) => {
             } else {
                 return res.status(400).send({
                     message:
-                        "No orders are available right now. Wait for the next Order."
+                        `Sorry !! No ${currentStatus === "all" ? null : currentStatus} orders available right now.`
                 });
             }
 

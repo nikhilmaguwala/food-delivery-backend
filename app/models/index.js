@@ -31,6 +31,7 @@ db.category = require("./category.model")(sequelize, DataTypes);
 db.dish = require("./dish.model.js")(sequelize, DataTypes);
 db.address = require("./address.model.js")(sequelize, DataTypes);
 db.order = require("./order.model")(sequelize, DataTypes);
+db.payment = require("./payment.model")(sequelize, DataTypes);
 
 
 // Setting relationships
