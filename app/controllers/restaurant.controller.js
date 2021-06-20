@@ -355,23 +355,22 @@ exports.retrieveOrders = async (req, res) => {
     const currentStatus = req.params.status; // pending orders or completed orders
 
     if (currentStatus !== "received" && currentStatus !== "preparing" && currentStatus !== "packing" && currentStatus !== "out_for_delivery" && currentStatus !== "completed" && currentStatus!== "all") {     // null status means all the orders
+                                                                                        // irrespective of category
         return res.status(400).send({
             message:
-                "Invalid status"
+                `Invalid status. There is no ${currentStatus} option.`
         });
-
     }
     
     if (currentStatus === "all") {
         try {
-            const data = await Order.find({
+            const data = await Order.findAll({
                 where: {
                     restaurant_id: restaurantId
                 }
             })
 
-            if (!data) {
-                console.log(data);
+            if (data.length > 0) {
                 return res.status(200).json(data);
                 
             } else {
@@ -383,7 +382,7 @@ exports.retrieveOrders = async (req, res) => {
 
         } catch (err) {
             return res.status(500).send({
-                message: `Some error occurred in retrieving ${currentStatus} orders.`,
+                message: `Some error occurred in retrieving ${currentStatus === "all" ? null : currentStatus} orders.`,
                 description: err
             });
         }
@@ -391,27 +390,26 @@ exports.retrieveOrders = async (req, res) => {
 
     else{
         try {
-            const data = await Order.find({
+            const data = await Order.findAll({
                 where: {
-                    // restaurant_id: restaurantId
+                    restaurant_id: restaurantId,
+                    status: currentStatus
                 }
             })
-
-            console.log(data);
             
             if (data.length > 0) {
-                console.log(data);
                 return res.status(200).json(data);
+
             } else {
                 return res.status(400).send({
                     message:
-                        "No orders are available right now. Wait for the next Order."
+                        `No ${currentStatus === "all" ? null : currentStatus} orders are available right now.`
                 });
             }
 
         } catch (err) {
             return res.status(500).send({
-                message: `Some error occurred in retrieving ${currentStatus} orders.`,
+                message: `Some error occurred in retrieving ${currentStatus === "all" ? null : currentStatus} orders.`,
                 description: err
             });
         }
