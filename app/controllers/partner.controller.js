@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const db = require("../models");
 const jwtConfig = require("../config/jwt.config");
-const { ROLES } = require("../utilities/constants");
+const {ROLES} = require("../utilities/constants");
 
 const Partner = db.partner;
 
@@ -21,24 +21,21 @@ exports.signup = async (req, res) => {
         where: {
             email: req.body.email
         }
-    }).then(function(user) {
+    }).then(function (user) {
         if (user) {
             res.status(400).send({
                 message: "Partner with E-Mail Id already exists!"
             });
-            return;
         } else {
             Partner.findOne({
                 where: {
                     phone: req.body.phone
                 }
-            }).then(function(user) {
+            }).then(function (user) {
                 if (user) {
                     res.status(400).send({
                         message: "Partner with Contact Number already exists!"
                     });
-                    return;
-
                 } else {
                     const partner = {
                         name: req.body.name,
@@ -127,7 +124,7 @@ exports.delete = (req, res) => {
     const id = req.params.id;
 
     Partner.destroy({
-        where: { id: id }
+        where: {id: id}
     })
         .then(num => {
             if (num === 1) {
@@ -155,7 +152,7 @@ exports.deleteAll = (req, res) => {
         truncate: false
     })
         .then(nums => {
-            res.send({ message: `${nums} Partners were deleted successfully!` });
+            res.send({message: `${nums} Partners were deleted successfully!`});
         })
         .catch(err => {
             res.status(500).send({

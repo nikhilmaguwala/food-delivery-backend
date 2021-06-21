@@ -19,7 +19,7 @@ exports.create = async (req, res) => {
         }
     })
 
-    if(existCategory) {
+    if (existCategory) {
         return res.status(400).send({
             message: "Category already exist"
         });
@@ -34,8 +34,7 @@ exports.create = async (req, res) => {
         // Save Category in the database
         const data = await Category.create(category);
         res.send(data);
-    }
-    catch(err) {
+    } catch (err) {
         res.status(500).send({
             message: "Some error occurred while Adding the Category.",
             description: err
@@ -48,13 +47,12 @@ exports.create = async (req, res) => {
 // Retrieve all Categories from the database.
 exports.findAll = async (req, res) => {
     const title = req.query.name;
-    const condition = title ? { name: { [Op.iLike]: `%${title}%` } } : null;
+    const condition = title ? {name: {[Op.iLike]: `%${title}%`}} : null;
 
     try {
-        const data = await Category.findAll({ where: condition });
+        const data = await Category.findAll({where: condition});
         res.send(data);
-    }
-    catch (err){
+    } catch (err) {
         res.status(500).send({
             message: "Some error occurred while Retrieving the Categories.",
             description: err
@@ -70,18 +68,14 @@ exports.findOne = async (req, res) => {
     try {
         const data = await Category.findByPk(id);
 
-        if(!data)
-        {
+        if (!data) {
             res.status(404).send({
                 message: `Category with id=${id} was not found`
             });
-        }
-        else
-        {
+        } else {
             res.send(data);
         }
-    }
-    catch (err) {
+    } catch (err) {
         res.status(500).send({
             message: "Error retrieving Category with id=" + id,
             description: err
@@ -95,7 +89,7 @@ exports.update = async (req, res) => {
 
     try {
         const result = await Category.update(req.body, {
-            where: { id: id }
+            where: {id: id}
         });
 
         if (result[0] === 1) {
@@ -107,8 +101,7 @@ exports.update = async (req, res) => {
                 message: `Cannot update Category with id=${id}. Maybe Category was not found or req.body is empty!`
             });
         }
-    }
-    catch (err) {
+    } catch (err) {
         res.status(500).send({
             message: "Error updating Category with id=" + id,
             description: err
@@ -123,7 +116,7 @@ exports.delete = async (req, res) => {
 
     try {
         const result = await Category.destroy({
-            where: { id: id }
+            where: {id: id}
         })
 
         if (result === 1) {
@@ -135,8 +128,7 @@ exports.delete = async (req, res) => {
                 message: `Cannot delete Category with id=${id}. Maybe Category was not found!`
             });
         }
-    }
-    catch (err) {
+    } catch (err) {
         res.status(500).send({
             message: "Could not delete Category with id=" + id,
             description: err
@@ -153,9 +145,8 @@ exports.deleteAll = async (req, res) => {
             truncate: false
         });
 
-        res.send({ message: `${result} Categories were deleted successfully!` });
-    }
-    catch (err) {
+        res.send({message: `${result} Categories were deleted successfully!`});
+    } catch (err) {
         res.status(500).send({
             message: "Some error occurred while removing all Categories.",
             description: err

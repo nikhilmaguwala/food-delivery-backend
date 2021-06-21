@@ -1,6 +1,6 @@
 const authJwt = require('./auth/verifyJwtToken');
-const { ROLES } = require("../utilities/constants");
-const { permit } = require("./auth/authPermissions");
+const {ROLES} = require("../utilities/constants");
+const {permit} = require("./auth/authPermissions");
 
 module.exports = app => {
     const restaurant = require("../controllers/restaurant.controller");
@@ -8,7 +8,7 @@ module.exports = app => {
     const router = require("express").Router();
 
     // Create a new Restaurant
-    router.post("/",[authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.create);
+    router.post("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], restaurant.create);
 
     // Retrieve all Restaurants
     // router.get("/", [authJwt.verifyJwtToken, permit(roles.PARTNER, roles.DEFAULT)], restaurant.findAll);

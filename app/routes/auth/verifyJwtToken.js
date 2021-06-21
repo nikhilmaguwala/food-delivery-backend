@@ -3,26 +3,25 @@ const jwtConfig = require('../../config/jwt.config');
 const db = require("../../models");
 const Users = db.user;
 const Partners = db.partner;
-const { ROLES } = require('../../utilities/constants');
+const {ROLES} = require('../../utilities/constants');
 
 exports.verifyJwtToken = (req, res, next) => {
     let token = req.headers['x-access-token'];
 
-    if (!token){
+    if (!token) {
         return res.status(403).send({
             auth: false, message: 'No token provided.'
         });
     }
     jwt.verify(token, jwtConfig.JWT_SECRET, (err, decoded) => {
-        if (err){
+        if (err) {
             return res.status(500).send({
                 auth: false,
                 message: 'Fail to Authenticate.',
                 description: err
             });
         }
-        if (decoded.role === ROLES.DEFAULT)
-        {
+        if (decoded.role === ROLES.DEFAULT) {
             Users.findOne({
                 where: {
                     id: decoded.id
@@ -44,9 +43,7 @@ exports.verifyJwtToken = (req, res, next) => {
                     description: err
                 });
             });
-        }
-        else if (decoded.role === ROLES.PARTNER)
-        {
+        } else if (decoded.role === ROLES.PARTNER) {
             Partners.findOne({
                 where: {
                     id: decoded.id

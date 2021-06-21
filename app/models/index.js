@@ -1,6 +1,6 @@
 const dbConfig = require("../config/db.config.js");
 
-const { Sequelize, DataTypes } = require("sequelize");
+const {Sequelize, DataTypes} = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
     dialect: dbConfig.dialect,
@@ -36,16 +36,16 @@ db.order = require("./order.model")(sequelize, DataTypes);
 // Setting relationships
 
 //1. Many to One relationships
-db.user.hasMany(db.address, { foreignKey : 'user_id' });
-db.address.belongsTo(db.user, { foreignKey : 'user_id' });
+db.user.hasMany(db.address, {foreignKey: 'user_id'});
+db.address.belongsTo(db.user, {foreignKey: 'user_id'});
 
-db.restaurant.hasMany(db.dish, { foreignKey: 'restaurant_id' });
-db.dish.belongsTo(db.restaurant, { foreignKey: 'restaurant_id' });
+db.restaurant.hasMany(db.dish, {foreignKey: 'restaurant_id'});
+db.dish.belongsTo(db.restaurant, {foreignKey: 'restaurant_id'});
 
-db.user.hasMany(db.order, { foreignKey : 'user_id' });
-db.order.belongsTo(db.user, { foreignKey : 'user_id' });
+db.user.hasMany(db.order, {foreignKey: 'user_id'});
+db.order.belongsTo(db.user, {foreignKey: 'user_id'});
 
-db.order.belongsTo(db.address, { foreignKey : 'address_id' });
+db.order.belongsTo(db.address, {foreignKey: 'address_id'});
 
 //2. Many to Many relationships
 db.dish.belongsToMany(db.order, {
@@ -55,6 +55,15 @@ db.dish.belongsToMany(db.order, {
 db.order.belongsToMany(db.dish, {
     through: "order_dish",
     foreignKey: "order_id",
+});
+
+db.user.belongsToMany(db.restaurant, {
+    through: "favourite",
+    foreignKey: "user_id",
+});
+db.restaurant.belongsToMany(db.user, {
+    through: "favourite",
+    foreignKey: "restaurant_id",
 });
 
 db.restaurant.belongsToMany(db.category, {

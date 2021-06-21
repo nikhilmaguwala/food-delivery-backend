@@ -1,19 +1,19 @@
 const puppeteer = require('puppeteer');
 
-const { DISH_TYPES } = require("../utilities/constants");
+const {DISH_TYPES} = require("../utilities/constants");
 
 const isValidHttpUrl = (string) => {
-    const pattern = new RegExp('^(https?:\\/\\/)?'+
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+
-        '(\\#[-a-z\\d_]*)?$','i');
+    const pattern = new RegExp('^(https?:\\/\\/)?' +
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+        '((\\d{1,3}\\.){3}\\d{1,3}))' +
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+        '(\\?[;&a-z\\d%_.~+=-]*)?' +
+        '(\\#[-a-z\\d_]*)?$', 'i');
     return !!pattern.test(string);
 }
 
 const getDomain = (url) => {
-    if(url.includes('swiggy')){
+    if (url.includes('swiggy')) {
         return 'swiggy'
     } else if (url.includes('zomato')) {
         return 'zomato'
@@ -21,7 +21,7 @@ const getDomain = (url) => {
     return ''
 }
 
-async function autoScroll(page){
+async function autoScroll(page) {
     await page.evaluate(async () => {
         await new Promise((resolve, reject) => {
             let totalHeight = 0;
@@ -31,7 +31,7 @@ async function autoScroll(page){
                 window.scrollBy(0, distance);
                 totalHeight += distance;
 
-                if(totalHeight >= scrollHeight){
+                if (totalHeight >= scrollHeight) {
                     clearInterval(timer);
                     resolve();
                 }
@@ -44,13 +44,13 @@ const scrapRestaurant = async (url) => {
 
     console.log('Scraping Url: ' + url);
 
-    if(url === '') {
+    if (url === '') {
         return {
             error: 'Please Enter Proper Link'
         }
     }
 
-    if(!isValidHttpUrl(url)) {
+    if (!isValidHttpUrl(url)) {
         return {
             error: 'Please Enter Valid Url'
         }
@@ -62,15 +62,15 @@ const scrapRestaurant = async (url) => {
             executablePath: '/usr/bin/chromium-browser',
             ignoreDefaultArgs: ['--disable-extensions'],
             headless: true,
-            args: ['--no-sandbox','--disable-setuid-sandbox']
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
         const page = await browser.newPage();
         console.log('Site:', getDomain(url))
 
-        if(getDomain(url) === 'swiggy') {
+        if (getDomain(url) === 'swiggy') {
 
-            await page.goto(url, { waitUntil: 'load' });
+            await page.goto(url, {waitUntil: 'load'});
             await autoScroll(page);
 
             const data = await page.evaluate((DISH_TYPES) => {
@@ -83,7 +83,7 @@ const scrapRestaurant = async (url) => {
                 const image = document.querySelector('#root > div._3arMG > div.nDVxx > div.uSag_ > div._1637z > div._8MlDE > div > div._3mJdF > div > img').src;
 
                 const item_nodes = document.querySelectorAll('._2wg_t');
-                const items = Array.from(item_nodes).map((item) =>  {
+                const items = Array.from(item_nodes).map((item) => {
                     const name = item.querySelector('.styles_itemName__2Aoj9').innerText;
                     const type = item.querySelector('.styles_iconVeg__shLxJ') ? DISH_TYPES.VEG : DISH_TYPES.NON_VEG;
                     const price = item.querySelector('.rupee').innerText;
@@ -113,11 +113,10 @@ const scrapRestaurant = async (url) => {
                 image: data.image
             }
 
-        }
-        else if(getDomain(url) === 'zomato') {
+        } else if (getDomain(url) === 'zomato') {
 
             await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
-            await page.goto(url, { waitUntil: 'load' });
+            await page.goto(url, {waitUntil: 'load'});
             await autoScroll(page);
 
             const data = await page.evaluate((DISH_TYPES) => {
@@ -150,9 +149,9 @@ const scrapRestaurant = async (url) => {
                         }
                     });
 
-                }).flat().filter((item) => item !== undefined );
+                }).flat().filter((item) => item !== undefined);
 
-                return { title, rating, categories, location, city, image, items }
+                return {title, rating, categories, location, city, image, items}
 
             }, DISH_TYPES);
 

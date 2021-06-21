@@ -1,6 +1,6 @@
 const authJwt = require('./auth/verifyJwtToken');
-const { ROLES } = require("../utilities/constants");
-const { permit } = require("./auth/authPermissions");
+const {ROLES} = require("../utilities/constants");
+const {permit} = require("./auth/authPermissions");
 
 module.exports = app => {
     const dish = require("../controllers/dish.controller");

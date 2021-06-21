@@ -16,16 +16,11 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const db = require("./models");
-// db.sequelize.sync({ force: true })
-//     .then(() => { console.log('Dropped DB and Re-sync It'); })
-//     .catch((err) => { console.log(`Failed to Sync: ${err}`)  });
+app.use(bodyParser.urlencoded({extended: true}));
 
 // simple route
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to Food App API" });
+    res.json({message: "Welcome to Food App API"});
 });
 
 // set up routes to listen
@@ -37,6 +32,7 @@ require("./routes/category.routes")(app);
 require("./routes/order.routes")(app);
 require("./routes/address.routes")(app);
 require("./routes/db.routes")(app);
+require("./routes/favourite.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT;

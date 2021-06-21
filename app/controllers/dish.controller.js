@@ -16,7 +16,7 @@ exports.create = async (req, res) => {
 
     const ExistRes = await Restaurant.findByPk(req.body.restaurant_id)
 
-    if(!ExistRes) {
+    if (!ExistRes) {
         res.status(400).send({
             message: "Restaurant does not Exist!"
         });
@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
         }
     })
 
-    if(existDish) {
+    if (existDish) {
         res.status(400).send({
             message: "Dish in Restaurant already exist"
         });
@@ -61,9 +61,9 @@ exports.create = async (req, res) => {
 // Retrieve all Dishes from the database.
 exports.findAll = (req, res) => {
     const title = req.query.dish_name;
-    const condition = title ? { dish_name: { [Op.iLike]: `%${title}%` } } : null;
+    const condition = title ? {dish_name: {[Op.iLike]: `%${title}%`}} : null;
 
-    Dish.findAll({ where: condition })
+    Dish.findAll({where: condition})
         .then(data => {
             res.send(data);
         })
@@ -81,13 +81,11 @@ exports.findOne = (req, res) => {
 
     Dish.findByPk(id)
         .then(data => {
-            if(!data)
-            {
+            if (!data) {
                 res.status(404).send({
                     message: `Dish with id=${id} was not found`
                 });
-            }
-            else {
+            } else {
                 res.send(data);
             }
         })
@@ -104,7 +102,7 @@ exports.update = (req, res) => {
     const id = req.params.id;
 
     Dish.update(req.body, {
-        where: { id: id }
+        where: {id: id}
     })
         .then(num => {
             if (num[0] === 1) {
@@ -130,7 +128,7 @@ exports.delete = (req, res) => {
     const id = req.params.id;
 
     Dish.destroy({
-        where: { id: id }
+        where: {id: id}
     })
         .then(num => {
             if (num === 1) {
@@ -158,7 +156,7 @@ exports.deleteAll = (req, res) => {
         truncate: false
     })
         .then(nums => {
-            res.send({ message: `${nums} Dishes were deleted successfully!` });
+            res.send({message: `${nums} Dishes were deleted successfully!`});
         })
         .catch(err => {
             res.status(500).send({

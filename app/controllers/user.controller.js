@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const db = require("../models");
 const jwtConfig = require("../config/jwt.config");
-const { ROLES } = require("../utilities/constants");
+const {ROLES} = require("../utilities/constants");
 
 const User = db.user;
 
@@ -20,24 +20,21 @@ exports.signup = async (req, res) => {
         where: {
             email: req.body.email
         }
-    }).then(function(user) {
+    }).then(function (user) {
         if (user) {
             res.status(400).send({
                 message: "User with E-Mail Id already exists!"
             });
-            return;
         } else {
             User.findOne({
                 where: {
                     phone: req.body.phone
                 }
-            }).then(function(user) {
+            }).then(function (user) {
                 if (user) {
                     res.status(400).send({
                         message: "User with Contact Number already exists!"
                     });
-                    return;
-
                 } else {
                     const user = {
                         name: req.body.name,
@@ -90,7 +87,7 @@ exports.signin = async (req, res) => {
             });
         }
 
-        let token = jwt.sign({ id: user.id, role: ROLES.DEFAULT }, jwtConfig.JWT_SECRET, {
+        let token = jwt.sign({id: user.id, role: ROLES.DEFAULT}, jwtConfig.JWT_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
@@ -104,8 +101,7 @@ exports.signin = async (req, res) => {
             auth: true,
             accessToken: token
         });
-    }
-    catch (err) {
+    } catch (err) {
         res.status(500).send({
             message: 'Something went wrong.',
             description: err
@@ -118,7 +114,7 @@ exports.delete = (req, res) => {
     const id = req.params.id;
 
     User.destroy({
-        where: { id: id }
+        where: {id: id}
     })
         .then(num => {
             if (num === 1) {
@@ -146,7 +142,7 @@ exports.deleteAll = (req, res) => {
         truncate: false
     })
         .then(nums => {
-            res.send({ message: `${nums} Users were deleted successfully!` });
+            res.send({message: `${nums} Users were deleted successfully!`});
         })
         .catch(err => {
             res.status(500).send({

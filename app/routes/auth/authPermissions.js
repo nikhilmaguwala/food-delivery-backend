@@ -1,7 +1,7 @@
 exports.permit = (...permittedRoles) => {
 
     return (request, response, next) => {
-        const { role } = request
+        const {role} = request
         if (role && permittedRoles.includes(role)) {
             next(); // role is allowed, so continue on the next middleware
         } else {

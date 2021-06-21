@@ -4,20 +4,21 @@ const Address = db.address;
 // Create and Save a new Address
 exports.create = async (req, res) => {
     // Validate request
-    if (!req.body.alias || !req.body.landmark || !req.body.location || !req.body.type || !req.body.longitude || !req.body.latitude) {
+    if (!req.body.alias || !req.body.landmark || !req.body.location || !req.body.type || !req.body.longitude ||
+        !req.body.latitude || !req.body.city || !req.body.country || !req.body.zipcode) {
         return res.status(400).send({
             message: "Content can not be empty!"
         });
     }
 
     const ExistAddressAlias = await Address.findOne({
-        where : {
+        where: {
             alias: req.body.alias.toUpperCase(),
             user_id: req.userId
         }
     })
 
-    if(ExistAddressAlias) {
+    if (ExistAddressAlias) {
         return res.status(400).send({
             message: `Address with alias ${req.body.alias} already exists`
         });
@@ -31,15 +32,17 @@ exports.create = async (req, res) => {
         location: req.body.location,
         user_id: req.userId,
         longitude: req.body.longitude,
-        latitude: req.body.latitude
+        latitude: req.body.latitude,
+        city: req.body.city,
+        country: req.body.country,
+        zipcode: req.body.zipcode
     };
 
     // Save Address in the database
     try {
         const data = await Address.create(address);
         return res.send(data);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Some error occurred while Adding the Address.",
             description: err
@@ -50,10 +53,9 @@ exports.create = async (req, res) => {
 // Retrieve all Addresses from the database.
 exports.findAll = async (req, res) => {
     try {
-        const data = await Address.findAll({ where: {} });
+        const data = await Address.findAll({where: {}});
         return res.send(data);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Some error occurred while Retrieving the Addresses.",
             description: err
@@ -72,12 +74,10 @@ exports.findOne = async (req, res) => {
             return res.status(404).send({
                 message: `Address with id=${id} was not found`
             });
-        }
-        else {
+        } else {
             return res.send(data);
         }
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Error retrieving Address with id=" + id,
             description: err
@@ -97,8 +97,7 @@ exports.findUsersAllAddress = async (req, res) => {
         });
 
         return res.send(addresses);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Error retrieving Addresses of user with id:" + id,
             description: err
@@ -114,21 +113,19 @@ exports.update = async (req, res) => {
 
     try {
         const data = await Address.update(req.body, {
-            where: { id: id }
+            where: {id: id}
         });
 
         if (data[0] === 1) {
-            return  res.send({
+            return res.send({
                 message: "Address was updated successfully."
             });
-        }
-        else {
+        } else {
             return res.send({
                 message: `Cannot update Address with id=${id}. Maybe Address was not found or req.body is empty!`
             });
         }
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Error updating Address with id=" + id,
             description: err
@@ -142,7 +139,7 @@ exports.delete = async (req, res) => {
 
     try {
         const data = await Address.destroy({
-            where: { id: id }
+            where: {id: id}
         });
 
         if (data === 1) {
@@ -155,8 +152,7 @@ exports.delete = async (req, res) => {
             });
         }
 
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Could not delete Address with id=" + id,
             description: err
@@ -173,9 +169,8 @@ exports.deleteAll = async (req, res) => {
             truncate: false
         });
 
-        return res.send({ message: `${data} Addresses were deleted successfully!` });
-    }
-    catch (err) {
+        return res.send({message: `${data} Addresses were deleted successfully!`});
+    } catch (err) {
         return res.status(500).send({
             message: "Some error occurred while removing all Addresses.",
             description: err

@@ -34,16 +34,14 @@ exports.create = async (req, res) => {
 
         const dishes = []
         const notFoundDishes = []
-        for (let i=0; i<req.body.dishes.length; i++)
-        {
+        for (let i = 0; i < req.body.dishes.length; i++) {
             const dish = await Dish.findOne({
                 where: {id: req.body.dishes[i]}
             });
 
             if (dish) {
                 dishes.push(dish);
-            }
-            else {
+            } else {
                 notFoundDishes.push(req.body.dishes[i]);
             }
         }
@@ -56,22 +54,19 @@ exports.create = async (req, res) => {
                     new_order.addDish(dish);
                 });
                 return res.status(200).send(new_order);
-            }
-            catch (err) {
+            } catch (err) {
                 return res.status(500).send({
                     message: "Some error occurred while Adding the Order.",
                     description: err
                 });
             }
-        }
-        else {
+        } else {
             return res.status(404).send({
                 message: "One or More Dishes not found",
-                description: { dishes: notFoundDishes }
+                description: {dishes: notFoundDishes}
             });
         }
-    }
-    else {
+    } else {
         return res.status(404).send({
             message: "Address not found",
             description: `Address with id: ${req.body.address_id} and User id: ${req.userId} was not Found`
@@ -88,8 +83,7 @@ exports.findAll = async (req, res) => {
         });
 
         return res.send(data);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Some error occurred while retrieving orders.",
             description: err
@@ -104,25 +98,17 @@ exports.findOne = async (req, res) => {
     try {
         const order = await Order.findOne({
             where: {id: id},
-            include: [{
-                model: Dish
-            },
-            {
-                model: Address
-            }]
+            include: [{model: Dish}, {model: Address}]
         });
 
-        if(!order)
-        {
+        if (!order) {
             return res.status(404).send({
                 message: `Order with id=${id} was not found`
             });
-        }
-        else {
+        } else {
             return res.send(order);
         }
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Error retrieving Order with id=" + id,
             description: err
@@ -136,7 +122,7 @@ exports.delete = async (req, res) => {
 
     try {
         const num = await Order.destroy({
-            where: { id: id }
+            where: {id: id}
         });
 
         if (num === 1) {
@@ -148,8 +134,7 @@ exports.delete = async (req, res) => {
                 message: `Cannot delete Order with id=${id}. Maybe Order was not found!`
             });
         }
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send({
             message: "Could not delete Order with id=" + id,
             description: err
@@ -166,11 +151,127 @@ exports.deleteAll = async (req, res) => {
             truncate: false
         });
 
-        return res.send({ message: `${nums} Orders were deleted successfully!` });
-    }
-    catch (err) {
+        return res.send({message: `${nums} Orders were deleted successfully!`});
+    } catch (err) {
         return res.status(500).send({
-            message:"Some error occurred while removing all Orders.",
+            message: "Some error occurred while removing all Orders.",
+            description: err
+        });
+    }
+};
+
+// Set Order Delivery Status
+exports.setDeliveryStatus = async (req, res) => {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    try {
+        const {dataValues: order} = await Order.findOne({
+            where: {id: id},
+        });
+
+        if (!order) {
+            return res.status(404).send({
+                message: `Order with id=${id} was not found`
+            });
+        } else {
+            order.is_delivered = status
+
+            const data = await Order.update(order, {
+                where: {id: id}
+            });
+
+            if (data[0] === 1) {
+                return res.send({
+                    message: "Order Delivery Status set Successfully"
+                });
+            } else {
+                return res.send({
+                    message: `Cannot set Delivery Status for Order with id=${id}`
+                });
+            }
+        }
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error setting Delivery Status for Order with id=${id}`,
+            description: err
+        });
+    }
+};
+
+// Set Order Paid Status
+exports.setPaidStatus = async (req, res) => {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    try {
+        const {dataValues: order} = await Order.findOne({
+            where: {id: id},
+        });
+
+        if (!order) {
+            return res.status(404).send({
+                message: `Order with id=${id} was not found`
+            });
+        } else {
+            order.is_paid = status
+
+            const data = await Order.update(order, {
+                where: {id: id}
+            });
+
+            if (data[0] === 1) {
+                return res.send({
+                    message: "Order Paid Status set Successfully"
+                });
+            } else {
+                return res.send({
+                    message: `Cannot set Paid Status for Order with id=${id}`
+                });
+            }
+        }
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error setting Paid Status for Order with id=${id}`,
+            description: err
+        });
+    }
+};
+
+// Set Order Cancel Status
+exports.setCancelStatus = async (req, res) => {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    try {
+        const {dataValues: order} = await Order.findOne({
+            where: {id: id},
+        });
+
+        if (!order) {
+            return res.status(404).send({
+                message: `Order with id=${id} was not found`
+            });
+        } else {
+            order.is_cancelled = status
+
+            const data = await Order.update(order, {
+                where: {id: id}
+            });
+
+            if (data[0] === 1) {
+                return res.send({
+                    message: "Order Cancel Status set Successfully"
+                });
+            } else {
+                return res.send({
+                    message: `Cannot set Cancel Status for Order with id=${id}`
+                });
+            }
+        }
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error setting Cancel Status for Order with id=${id}`,
             description: err
         });
     }

@@ -1,6 +1,6 @@
 const authJwt = require('./auth/verifyJwtToken');
-const { ROLES } = require("../utilities/constants");
-const { permit } = require("./auth/authPermissions");
+const {ROLES} = require("../utilities/constants");
+const {permit} = require("./auth/authPermissions");
 
 module.exports = app => {
     const order = require("../controllers/order.controller");
@@ -8,7 +8,16 @@ module.exports = app => {
     const router = require("express").Router();
 
     // Create a new Order
-    router.post("/",[authJwt.verifyJwtToken, permit(ROLES.DEFAULT)], order.create);
+    router.post("/", [authJwt.verifyJwtToken, permit(ROLES.DEFAULT)], order.create);
+
+    // Set Order Delivery Status
+    router.post("/:id/delivery", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], order.setDeliveryStatus);
+
+    // Set Order Paid Status
+    router.post("/:id/paid", [authJwt.verifyJwtToken, permit(ROLES.PARTNER)], order.setPaidStatus);
+
+    // Set Order Cancel Cancel Status
+    router.post("/:id/cancel", [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], order.setCancelStatus);
 
     // Retrieve all Orders
     router.get("/", [authJwt.verifyJwtToken, permit(ROLES.PARTNER, ROLES.DEFAULT)], order.findAll);

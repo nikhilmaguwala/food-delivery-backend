@@ -22,7 +22,7 @@ exports.create = async (req, res) => {
         }
     })
 
-    if(existRes) {
+    if (existRes) {
         res.status(400).send({
             message: "Restaurant is already exist!"
         });
@@ -54,9 +54,9 @@ exports.create = async (req, res) => {
 // Retrieve all Restaurants from the database.
 exports.findAll = (req, res) => {
     const title = req.query.name;
-    const condition = title ? { name: { [Op.iLike]: `%${title}%` } } : null;
+    const condition = title ? {name: {[Op.iLike]: `%${title}%`}} : null;
 
-    Restaurant.findAll({ where: condition })
+    Restaurant.findAll({where: condition})
         .then(data => {
             res.send(data);
         })
@@ -78,18 +78,16 @@ exports.findOne = (req, res) => {
             model: Dish
         }]
     }).then(data => {
-            if(!data)
-            {
-                res.status(404).send({
-                    message: `Restaurant with id=${id} was not found`
-                });
-            }
-            else {
-                res.send(data);
-            }
-        })
+        if (!data) {
+            res.status(404).send({
+                message: `Restaurant with id=${id} was not found`
+            });
+        } else {
+            res.send(data);
+        }
+    })
         .catch(err => {
-            console.log("hel"+err)
+            console.log("hel" + err)
             res.status(500).send({
                 message: "Error retrieving Restaurant with id=" + id
             });
@@ -101,7 +99,7 @@ exports.update = (req, res) => {
     const id = req.params.id;
 
     Restaurant.update(req.body, {
-        where: { id: id }
+        where: {id: id}
     })
         .then(num => {
             if (num[0] === 1) {
@@ -116,7 +114,8 @@ exports.update = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating Restaurant with id=" + id
+                message: "Error updating Restaurant with id=" + id,
+                description: err
             });
         });
 };
@@ -126,7 +125,7 @@ exports.delete = (req, res) => {
     const id = req.params.id;
 
     Restaurant.destroy({
-        where: { id: id }
+        where: {id: id}
     })
         .then(num => {
             if (num === 1) {
@@ -141,7 +140,8 @@ exports.delete = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: "Could not delete Restaurant with id=" + id
+                message: "Could not delete Restaurant with id=" + id,
+                description: err
             });
         });
 };
@@ -153,7 +153,7 @@ exports.deleteAll = (req, res) => {
         truncate: false
     })
         .then(nums => {
-            res.send({ message: `${nums} Restaurants were deleted successfully!` });
+            res.send({message: `${nums} Restaurants were deleted successfully!`});
         })
         .catch(err => {
             res.status(500).send({
@@ -167,7 +167,7 @@ exports.deleteAll = (req, res) => {
 exports.createByLink = async (req, res) => {
     const restaurant = await scrapRestaurant(req.body.url);
 
-    if(restaurant.error) {
+    if (restaurant.error) {
         return res.status(500).send({
             message: "Invalid Link, Please check link and try again!"
         });
@@ -181,12 +181,9 @@ exports.createByLink = async (req, res) => {
         }
     });
 
-    if(existRes)
-    {
+    if (existRes) {
         res_id = parseInt(existRes.id);
-    }
-    else
-    {
+    } else {
         // Create Categories
         restaurant.categories.map(async category => {
             await Category.findOne({
@@ -194,9 +191,8 @@ exports.createByLink = async (req, res) => {
                     name: category
                 }
             }).then(async (data) => {
-                if (!data)
-                {
-                    await Category.create({ name: category })
+                if (!data) {
+                    await Category.create({name: category})
                         .then()
                         .catch((err) => {
                             return res.status(500).send({
@@ -242,7 +238,7 @@ exports.createByLink = async (req, res) => {
                     });
 
                 });
-            }).catch (err => {
+            }).catch(err => {
                 return res.status(500).send({
                     message: "Some error occurred while Adding the Scraped Restaurant.",
                     description: err
