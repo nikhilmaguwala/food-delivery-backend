@@ -32,6 +32,5 @@ module.exports = ADDRESSES = [
         "latitude": 21.192591,
         "longitude": 72.799753,
         "user_id": 3
-    },
-
+    }
 ]

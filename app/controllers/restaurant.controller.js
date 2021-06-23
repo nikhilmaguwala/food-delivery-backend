@@ -76,6 +76,9 @@ exports.findOne = (req, res) => {
         where: {id: id},
         include: [{
             model: Dish
+        },
+        {
+            model: Category
         }]
     }).then(data => {
         if (!data) {
