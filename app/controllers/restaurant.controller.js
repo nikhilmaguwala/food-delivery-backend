@@ -56,8 +56,12 @@ exports.findAll = (req, res) => {
     const title = req.query.name;
     const condition = title ? {name: {[Op.iLike]: `%${title}%`}} : null;
 
-    Restaurant.findAll({where: condition})
-        .then(data => {
+    Restaurant.findAll({
+        where: condition,
+        include: [{
+            model: Category
+        }]
+    }).then(data => {
             res.send(data);
         })
         .catch(err => {
